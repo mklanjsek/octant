@@ -49,48 +49,9 @@ export function createEdges(shapes: BaseShape[], edges: BackendEdgesDef) {
       value.forEach(val => {
         const sourceShape: BaseShape = ShapeUtils.findById(shapes, key)[0];
         const targetShape: BaseShape = ShapeUtils.findById(shapes, val.node)[0];
-        let add = true;
-        let sourceKey = val.node;
 
-        if (!sourceShape || !targetShape) {
-          add = false;
-        } else if (sourceShape.kind === targetShape.kind) {
-          add = false;
-        } else if (
-          sourceShape.kind === 'Deployment' &&
-          targetShape.kind === 'Deployment'
-        ) {
-          add = false;
-        } else if (
-          sourceShape.kind === 'ReplicaSet' ||
-          targetShape.kind === 'ReplicaSet'
-        ) {
-          add = false;
-        } else if (
-          sourceShape.kind === 'DaemonSet' ||
-          targetShape.kind === 'DaemonSet'
-        ) {
-          add = false;
-        } else if (
-          sourceShape.kind === 'StatefulSet' ||
-          targetShape.kind === 'StatefulSet'
-        ) {
-          add = false;
-        } else if (
-          sourceShape.kind === 'Pod' &&
-          targetShape.kind === 'Secret'
-        ) {
-          key = ShapeUtils.findByKind(shapes, 'ServiceAccount')[0].id;
-        } else if (
-          sourceShape.kind === 'ServiceAccount' &&
-          targetShape.kind === 'Service'
-        ) {
-          key = ShapeUtils.findByKind(shapes, 'Pod')[0].id;
-        }
-
-        // console.log(`Edge ${sourceShape.kind}-${targetShape.kind} ${add}`);
-        if (add) {
-          shapes.push(new Edge(`${key}-${val.node}`, sourceKey, key));
+        if (sourceShape && targetShape && sourceShape.kind !== targetShape.kind) {
+          shapes.push(new Edge(`${key}-${val.node}`, val.node, key));
         }
       });
     });

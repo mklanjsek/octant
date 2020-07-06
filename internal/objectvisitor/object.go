@@ -63,7 +63,10 @@ func (o *Object) Visit(ctx context.Context, object *unstructured.Unstructured, h
 					kubernetes.PrintObject(owner),
 					kubernetes.PrintObject(object))
 			}
-			return handler.AddEdge(ctx, object, owner)
+
+			if !o.isEdgeRedundant(object, owner) {
+				return handler.AddEdge(ctx, object, owner)
+			}
 		}
 
 		return nil
@@ -84,7 +87,11 @@ func (o *Object) Visit(ctx context.Context, object *unstructured.Unstructured, h
 						kubernetes.PrintObject(object))
 				}
 
-				return handler.AddEdge(ctx, object, child)
+				if !o.isEdgeRedundant(object, child) {
+					return handler.AddEdge(ctx, object, child)
+				} else {
+					return nil
+				}
 			})
 		}
 	}
@@ -94,4 +101,12 @@ func (o *Object) Visit(ctx context.Context, object *unstructured.Unstructured, h
 	}
 
 	return handler.Process(ctx, object)
+}
+
+func (o *Object) isEdgeRedundant(object *unstructured.Unstructured, owner *unstructured.Unstructured) bool {
+	if object.GetKind() == "ReplicaSet" || object.GetKind() == "Deployment" ||
+		owner.GetKind() == "ReplicaSet" || owner.GetKind() == "Deployment" {
+		return true
+	}
+	return false
 }

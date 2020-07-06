@@ -87,14 +87,34 @@ func (p *Pod) Visit(ctx context.Context, object *unstructured.Unstructured, hand
 			if err != nil {
 				return err
 			}
-			u := &unstructured.Unstructured{Object: m}
+			uServiceAccount := &unstructured.Unstructured{Object: m}
 
 			if serviceAccount != nil {
-				if err := visitor.Visit(ctx, u, handler, true); err != nil {
+				if err := visitor.Visit(ctx, uServiceAccount, handler, true); err != nil {
 					return errors.Wrapf(err, "pod %s visit service account %s",
 						kubernetes.PrintObject(pod), kubernetes.PrintObject(serviceAccount))
 				}
-				return handler.AddEdge(ctx, object, u)
+				handler.AddEdge(ctx, object, uServiceAccount)
+
+				g.Go(func() error {
+					secrets, err := p.queryer.SecretsForPod(ctx, pod)
+					if err != nil {
+						return err
+					}
+
+					for i := range secrets {
+						secret := secrets[i]
+						g.Go(func() error {
+							m, err := runtime.DefaultUnstructuredConverter.ToUnstructured(secret)
+							if err != nil {
+								return err
+							}
+							uSecret := &unstructured.Unstructured{Object: m}
+							return handler.AddEdge(ctx, uServiceAccount, uSecret)
+						})
+					}
+					return nil
+				})
 			}
 		}
 
@@ -111,27 +131,6 @@ func (p *Pod) Visit(ctx context.Context, object *unstructured.Unstructured, hand
 			configMap := configMaps[i]
 			g.Go(func() error {
 				m, err := runtime.DefaultUnstructuredConverter.ToUnstructured(configMap)
-				if err != nil {
-					return err
-				}
-				u := &unstructured.Unstructured{Object: m}
-				return handler.AddEdge(ctx, object, u)
-			})
-		}
-
-		return nil
-	})
-
-	g.Go(func() error {
-		secrets, err := p.queryer.SecretsForPod(ctx, pod)
-		if err != nil {
-			return err
-		}
-
-		for i := range secrets {
-			secret := secrets[i]
-			g.Go(func() error {
-				m, err := runtime.DefaultUnstructuredConverter.ToUnstructured(secret)
 				if err != nil {
 					return err
 				}

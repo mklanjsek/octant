@@ -46,7 +46,11 @@ export abstract class Shape extends BaseShape {
   }
 
   getPosition(shapes: BaseShape[]): { x: number; y: number } {
-    return this.preferredPosition();
+    const preferred= this.preferredPosition();
+    const sameKind= shapes.filter(shape => shape.kind === this.kind);
+    const isFirst= sameKind.length > 1 && sameKind[0].id === this.id;
+
+    return sameKind.length > 1 && !isFirst ? {x: preferred.x, y: preferred.y + 4 * this.height / 3} : preferred;
   }
 
   getPortPosition(shapes: Shape[], port: Port): { x: number; y: number } {
