@@ -53,8 +53,6 @@ func TestObject_Visit(t *testing.T) {
 			},
 			handler: func(ctrl *gomock.Controller) *fake.MockObjectHandler {
 				handler := fake.NewMockObjectHandler(ctrl)
-				handler.EXPECT().AddEdge(gomock.Any(), replicaSet, pod).Return(nil)
-				handler.EXPECT().AddEdge(gomock.Any(), replicaSet, deployment).Return(nil)
 				handler.EXPECT().Process(gomock.Any(), replicaSet).Return(nil)
 				return handler
 			},
@@ -81,8 +79,6 @@ func TestObject_Visit(t *testing.T) {
 			visitObject: pod,
 			handler: func(ctrl *gomock.Controller) *fake.MockObjectHandler {
 				handler := fake.NewMockObjectHandler(ctrl)
-				handler.EXPECT().AddEdge(gomock.Any(), pod, replicaSet).Return(nil)
-				handler.EXPECT().AddEdge(gomock.Any(), pod, deployment).Return(nil)
 				handler.EXPECT().Process(gomock.Any(), pod).Return(nil)
 				return handler
 			},

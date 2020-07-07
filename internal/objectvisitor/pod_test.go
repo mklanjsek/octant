@@ -52,7 +52,7 @@ func TestPod_Visit(t *testing.T) {
 	handler.EXPECT().
 		AddEdge(gomock.Any(), u, testutil.ToUnstructured(t, configMap)).
 		Return(nil)
-	handler.EXPECT().AddEdge(gomock.Any(), u, testutil.ToUnstructured(t, secret)).
+	handler.EXPECT().AddEdge(gomock.Any(), testutil.ToUnstructured(t, serviceAccount), testutil.ToUnstructured(t, secret)).
 		Return(nil)
 
 	var visited []unstructured.Unstructured
