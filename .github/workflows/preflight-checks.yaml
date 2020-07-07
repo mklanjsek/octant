@@ -53,7 +53,7 @@ jobs:
     runs-on: ${{ matrix.platform }}
     name: Karma tests on ${{ matrix.platform }}
     steps:
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2.0.0
       - uses: actions/checkout@v2
       - name: run_karma
         run: |
@@ -71,7 +71,7 @@ jobs:
     runs-on: ${{ matrix.platform }}
     name: Build on ${{ matrix.platform }}
     steps:
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2.0.0
       - uses: actions/setup-go@v2
         with:
           go-version: ${{ matrix.go-version }}
@@ -95,7 +95,7 @@ jobs:
           go run build.go build
       - name: Upload web/rice-box.go
         if: matrix.platform == 'ubuntu-latest'
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2.0.1
         with:
           name: rice-web
           path: web/rice-box.go
@@ -108,14 +108,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Download web/rice-box.go
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: rice-web
+          path: web
       - name: Change permissions of rice files
         # Uploading artifact changes file permissions
         run: |
           chown -R $(whoami):$(whoami) .
-          mv rice-web/rice-box.go ./web/
       - name: Run GoReleaser
         run: |
           goreleaser --rm-dist
