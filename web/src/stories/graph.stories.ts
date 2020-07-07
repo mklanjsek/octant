@@ -1,5 +1,11 @@
 import {storiesOf} from '@storybook/angular';
-import {createEdges, establishRelations, REAL_DATA} from "./graph.real.data";
+import {
+  createEdges,
+  establishRelations,
+  REAL_DATA_DAEMON_SET, REAL_DATA_DAEMON_SET2,
+  REAL_DATA_DEPLOYMENT,
+  REAL_DATA_STATEFUL_SET,
+} from './graph.real.data';
 import {object} from "@storybook/addon-knobs";
 import {
   Deployment,
@@ -21,7 +27,7 @@ const zoom = {
   max: 2.0,
 };
 
-storiesOf('Resources', module).add('using ports', () => {
+storiesOf('Resources', module).add('with ports', () => {
   const oldShapesWithPorts: BaseShape[] = [
     new Deployment('glyph0', 'Deployment', true),
     new Secret('glyph2', 'Secret', true),
@@ -65,32 +71,41 @@ storiesOf('Resources', module).add('using ports', () => {
   }
 });
 
-storiesOf('Resources', module).add('backend data', () => {
-  let newShapes= Object.entries(REAL_DATA.nodes).map(([key, value]) => ShapeUtils.fromDataStream( key, value));
+const testCases= [{title:'Deployment', data: REAL_DATA_DEPLOYMENT},
+ {title:'StatefulSet', data: REAL_DATA_STATEFUL_SET},
+ {title:'DaemonSet', data: REAL_DATA_DAEMON_SET},
+ {title:'single DaemonSet', data: REAL_DATA_DAEMON_SET2},
+];
 
-  createEdges(newShapes, REAL_DATA.edges);
-  newShapes= establishRelations(newShapes);
+testCases.map(story =>
+  storiesOf('Resources', module).add(`with ${story.title}`, () => {
+    let newShapes= Object.entries(story.data.nodes).map(([key, value]) => ShapeUtils.fromDataStream( key, value));
 
-  const eles = object('elements', newShapes.map(shape => shape.toNode(newShapes)));
+    if(story.data.edges) {
+      createEdges(newShapes, story.data.edges);
+    }
+    newShapes= establishRelations(newShapes);
 
-  return {
-    props: {
-      elements: eles,
-      layout: layout,
-      zoom: zoom,
-    },
-    template: `
-      <div class="main-container">
-          <div class="content-container">
-              <div class="content-area" style="background-color: white;">
-                  <app-cytoscape2
-                    [elements]="elements" 
-                    [layout]="layout" 
-                    [zoom]="zoom"> 
-                  </app-cytoscape2>
-              </div>
-          </div>
-      </div>
-      `,
-  }
-});
+    const eles = object('elements', newShapes.map(shape => shape.toNode(newShapes)));
+
+    return {
+      props: {
+        elements: eles,
+        layout: layout,
+        zoom: zoom,
+      },
+      template: `
+        <div class="main-container">
+            <div class="content-container">
+                <div class="content-area" style="background-color: white;">
+                    <app-cytoscape2
+                      [elements]="elements" 
+                      [layout]="layout" 
+                      [zoom]="zoom"> 
+                    </app-cytoscape2>
+                </div>
+            </div>
+        </div>
+        `,
+    }
+}));

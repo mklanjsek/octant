@@ -37,6 +37,15 @@ export function positionChildren(
   cy: cytoscape.Core,
   node: cytoscape.NodeSingular
 ) {
+  moveChildren(cy, node, { x: 0, y: 0 });
+  const options: OctantLayoutOptions = { name: 'octant', fit: false };
+  cy.nodes().layout(options).run();
+}
+
+export function layoutChildren(
+  cy: cytoscape.Core,
+  node: cytoscape.NodeSingular
+) {
   const offset = {
     x: node.position().x - node.data('x'),
     y: node.position().y - node.data('y'),

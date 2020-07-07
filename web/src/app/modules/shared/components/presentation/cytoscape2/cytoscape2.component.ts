@@ -15,7 +15,11 @@ import {
 } from '@angular/core';
 
 import cytoscape, { NodeSingular, SingularData, Stylesheet } from 'cytoscape';
-import { hideChildren, positionChildren } from './octant.layout';
+import {
+  hideChildren,
+  positionChildren,
+  layoutChildren,
+} from './octant.layout';
 import coseBilkent from 'cytoscape-cose-bilkent';
 import octant from './octant.layout';
 import { ELEMENTS_STYLE } from './octant.style';
@@ -65,7 +69,7 @@ export class Cytoscape2Component implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.elements && this.cytoscape) {
       this.applied = false;
-      this.cytoscape.nodes('[hasChildren]').forEach(node => {
+      this.cytoscape.nodes('[?hasChildren]').forEach(node => {
         hideChildren(this.cytoscape, node);
       });
     }
@@ -94,7 +98,7 @@ export class Cytoscape2Component implements OnChanges {
       if (!this.applied) {
         this.applied = true;
         this.cytoscape
-          .nodes('[hasChildren]')
+          .nodes('[?hasChildren]')
           .forEach(node => positionChildren(this.cytoscape, node));
         this.cytoscape.fit();
       }
@@ -110,7 +114,7 @@ export class Cytoscape2Component implements OnChanges {
 
     this.cytoscape.on('dragfree', 'node', e => {
       const node: NodeSingular = e.target;
-      positionChildren(this.cytoscape, node);
+      layoutChildren(this.cytoscape, node);
       this.moveStarted = false;
     });
   }

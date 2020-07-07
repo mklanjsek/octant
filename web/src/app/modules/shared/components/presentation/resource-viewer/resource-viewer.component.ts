@@ -151,12 +151,14 @@ export class ResourceViewerComponent implements OnChanges, AfterViewInit {
   }
 
   generateGraphData2(): ElementsDefinition {
-
+    // console.log('data', JSON.stringify(this.currentView.config));
     let newShapes = Object.entries(
       this.currentView.config.nodes
     ).map(([key, value]) => ShapeUtils.fromDataStream(key, value));
 
-    createEdges(newShapes, this.currentView.config.edges);
+    if (this.currentView.config.edges) {
+      createEdges(newShapes, this.currentView.config.edges);
+    }
     newShapes = establishRelations(newShapes);
 
     // @ts-ignore: temporary

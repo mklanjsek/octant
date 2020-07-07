@@ -104,8 +104,8 @@ func (o *Object) Visit(ctx context.Context, object *unstructured.Unstructured, h
 }
 
 func (o *Object) isEdgeRedundant(object *unstructured.Unstructured, owner *unstructured.Unstructured) bool {
-	if object.GetKind() == "ReplicaSet" || object.GetKind() == "Deployment" ||
-		owner.GetKind() == "ReplicaSet" || owner.GetKind() == "Deployment" {
+	if object.GetKind() == "ReplicaSet" || object.GetKind() == "Deployment" || object.GetKind() == "StatefulSet" || object.GetKind() == "DaemonSet" ||
+		owner.GetKind() == "ReplicaSet" || owner.GetKind() == "Deployment"  || owner.GetKind() == "StatefulSet" || owner.GetKind() == "DaemonSet"{
 		return true
 	}
 	return false
