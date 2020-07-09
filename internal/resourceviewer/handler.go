@@ -381,6 +381,42 @@ func isObjectParent(child, parent runtime.Object) (bool, error) {
 	return false, nil
 }
 
+func establishRelations(object runtime.Object) (string, bool, error) {
+	m, err := runtime.DefaultUnstructuredConverter.ToUnstructured(object)
+	if err != nil {
+		return "", false, err
+	}
+
+	u := &unstructured.Unstructured{Object: m}
+	kind := u.GetKind()
+
+	accessor, err := meta.Accessor(object)
+	if err != nil {
+		return "", false, err
+	}
+
+	ownerReferences:= accessor.GetOwnerReferences()
+	parentId:= ""
+
+	if len(ownerReferences) > 0 {
+		parentId = string(ownerReferences[0].UID)
+	}
+
+	switch string(kind) {
+	case "DaemonSet":
+		return "", true, nil
+	case "StatefulSet":
+		return "", true, nil
+	case "Deployment":
+		return "", true, nil
+	case "ReplicaSet":
+		return parentId, true, nil
+	case "Pod":
+		return parentId, false, nil
+	}
+	return "", false, nil
+}
+
 type ObjectStatus interface {
 	Status(ctx context.Context, object runtime.Object) (*objectstatus.ObjectStatus, error)
 }

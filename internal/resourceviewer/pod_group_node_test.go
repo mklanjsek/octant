@@ -42,6 +42,9 @@ func Test_podGroupNode(t *testing.T) {
 		Kind:       "Pod",
 		Status:     component.NodeStatusOK,
 		Details:    []component.Component{podStatus},
+		HasChildren: false,
+		Namespace: "namespace",
+		Created: 	pod.GetCreationTimestamp().Time.Unix(),
 	}
 
 	testutil.AssertJSONEqual(t, expected, got)

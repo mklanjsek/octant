@@ -50,6 +50,9 @@ func Test_objectNode(t *testing.T) {
 		Kind:       deployment.GetKind(),
 		Status:     component.NodeStatusOK,
 		Path:       deploymentLink,
+		HasChildren: true,
+		Namespace: "namespace",
+		Created: 	deployment.GetCreationTimestamp().Time.Unix(),
 	}
 
 	testutil.AssertJSONEqual(t, expected, got)

@@ -54,6 +54,11 @@ func (o *objectNode) Create(ctx context.Context, object *unstructured.Unstructur
 		return nil, err
 	}
 
+	parentId, hasChildren, err := establishRelations(object)
+	if err != nil {
+		return nil, err
+	}
+
 	node := &component.Node{
 		Name:       accessor.GetName(),
 		APIVersion: apiVersion,
@@ -61,6 +66,10 @@ func (o *objectNode) Create(ctx context.Context, object *unstructured.Unstructur
 		Status:     status.Status(),
 		Details:    status.Details,
 		Path:       objectPath,
+		ParentID:   parentId,
+		HasChildren: hasChildren,
+		Namespace:  object.GetNamespace(),
+		Created:    object.GetCreationTimestamp().Time.Unix(),
 	}
 
 	return node, nil

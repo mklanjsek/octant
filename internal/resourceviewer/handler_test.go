@@ -176,6 +176,8 @@ func TestHandler(t *testing.T) {
 			Kind:       cr.Kind,
 			Status:     component.NodeStatusOK,
 			Path:       objectPath(t, cr),
+			HasChildren: false,
+			Created: cr.GetCreationTimestamp().Time.Unix(),
 		},
 		string(deployment.UID): {
 			Name:       deployment.Name,
@@ -183,6 +185,9 @@ func TestHandler(t *testing.T) {
 			Kind:       deployment.Kind,
 			Status:     component.NodeStatusOK,
 			Path:       objectPath(t, deployment),
+			HasChildren: true,
+			Namespace: "namespace",
+			Created: 	deployment.GetCreationTimestamp().Time.Unix(),
 		},
 		string(replicaSet1.UID): {
 			Name:       replicaSet1.Name,
@@ -190,6 +195,10 @@ func TestHandler(t *testing.T) {
 			Kind:       replicaSet1.Kind,
 			Status:     component.NodeStatusOK,
 			Path:       objectPath(t, replicaSet1),
+			HasChildren: true,
+			ParentID: string(deployment.UID),
+			Namespace: "namespace",
+			Created: 	replicaSet1.GetCreationTimestamp().Time.Unix(),
 		},
 		string(replicaSet3.UID): {
 			Name:       replicaSet3.Name,
@@ -197,6 +206,10 @@ func TestHandler(t *testing.T) {
 			Kind:       replicaSet3.Kind,
 			Status:     component.NodeStatusOK,
 			Path:       objectPath(t, replicaSet3),
+			HasChildren: true,
+			ParentID: string(deployment.UID),
+			Namespace: "namespace",
+			Created: 	replicaSet3.GetCreationTimestamp().Time.Unix(),
 		},
 		string(pod3.UID): {
 			Name:       pod3.Name,
@@ -204,6 +217,9 @@ func TestHandler(t *testing.T) {
 			Kind:       pod3.Kind,
 			Status:     component.NodeStatusOK,
 			Path:       objectPath(t, pod3),
+			HasChildren: false,
+			Namespace: "namespace",
+			Created: 	pod3.GetCreationTimestamp().Time.Unix(),
 		},
 		fmt.Sprintf("%s pods", replicaSet1.Name): {
 			Name:       fmt.Sprintf("%s pods", replicaSet1.Name),
@@ -211,6 +227,10 @@ func TestHandler(t *testing.T) {
 			Kind:       "Pod",
 			Status:     component.NodeStatusOK,
 			Details:    []component.Component{podStatus1},
+			ParentID: string(replicaSet1.UID),
+			HasChildren: false,
+			Namespace: "namespace",
+			Created: 	pod3.GetCreationTimestamp().Time.Unix(),
 		},
 		fmt.Sprintf("%s pods", replicaSet3.Name): {
 			Name:       fmt.Sprintf("%s pods", replicaSet3.Name),
@@ -218,6 +238,10 @@ func TestHandler(t *testing.T) {
 			Kind:       "Pod",
 			Status:     component.NodeStatusOK,
 			Details:    []component.Component{podStatus2},
+			ParentID: string(replicaSet3.UID),
+			Namespace: "namespace",
+			Created: 	pod4.GetCreationTimestamp().Time.Unix(),
+			HasChildren: false,
 		},
 		string(serviceAccount.UID): {
 			Name:       serviceAccount.Name,
@@ -225,6 +249,9 @@ func TestHandler(t *testing.T) {
 			Kind:       serviceAccount.Kind,
 			Status:     component.NodeStatusOK,
 			Path:       objectPath(t, serviceAccount),
+			HasChildren: false,
+			Namespace: "namespace",
+			Created: 	serviceAccount.GetCreationTimestamp().Time.Unix(),
 		},
 		string(service1.UID): {
 			Name:       service1.Name,
@@ -232,6 +259,9 @@ func TestHandler(t *testing.T) {
 			Kind:       service1.Kind,
 			Status:     component.NodeStatusOK,
 			Path:       objectPath(t, service1),
+			HasChildren: false,
+			Namespace: "namespace",
+			Created: 	service1.GetCreationTimestamp().Time.Unix(),
 		},
 	}
 
@@ -350,4 +380,164 @@ func mockLinkPath(t *testing.T, dashConfig *configFake.MockDash, object runtime.
 		ObjectPath(accessor.GetNamespace(), apiVersion, kind, accessor.GetName()).
 		Return(label, nil).
 		AnyTimes()
+}
+
+func Test_establishRelations(t *testing.T) {
+	deployment := testutil.CreateDeployment("deployment")
+	deploymentUnstructured := testutil.ToUnstructured(t, deployment)
+
+	replicaSet := testutil.CreateAppReplicaSet("replica-set")
+	replicaSet.Spec.Replicas = pointer.Int32Ptr(1)
+	replicaSet.SetOwnerReferences(testutil.ToOwnerReferences(t, deployment))
+	replicaSetUnstructured := testutil.ToUnstructured(t, replicaSet)
+
+	serviceAccount := testutil.CreateServiceAccount("service-account")
+	serviceAccountUnstructured := testutil.ToUnstructured(t, serviceAccount)
+
+	pod1 := testutil.CreatePod("pod-1")
+	pod1.Spec.ServiceAccountName = serviceAccount.Name
+	pod1.SetOwnerReferences(testutil.ToOwnerReferences(t, replicaSet))
+	pod1Unstructured := testutil.ToUnstructured(t, pod1)
+	pod2 := testutil.CreatePod("pod-2")
+	pod2.Spec.ServiceAccountName = serviceAccount.Name
+	pod2.SetOwnerReferences(testutil.ToOwnerReferences(t, replicaSet))
+	pod2Unstructured := testutil.ToUnstructured(t, pod2)
+
+	service := testutil.CreateService("service")
+	serviceUnstructured := testutil.ToUnstructured(t, service)
+
+	controller := gomock.NewController(t)
+	defer controller.Finish()
+
+	dashConfig := configFake.NewMockDash(controller)
+
+	objectStore := storeFake.NewMockStore(controller)
+	dashConfig.EXPECT().ObjectStore().Return(objectStore).AnyTimes()
+
+	pluginManager := pluginFake.NewMockManagerInterface(controller)
+	dashConfig.EXPECT().PluginManager().Return(pluginManager).AnyTimes()
+
+	objectStatus := fake.NewMockObjectStatus(controller)
+	objectStatus.EXPECT().
+		Status(gomock.Any(), gomock.Any()).
+		Return(&objectstatus.ObjectStatus{}, nil).
+		AnyTimes()
+
+	handler, err := NewHandler(dashConfig, SetHandlerObjectStatus(objectStatus))
+	require.NoError(t, err)
+
+	ctx := context.Background()
+	mockRelations := func(a *unstructured.Unstructured, objects ...*unstructured.Unstructured) {
+		for _, b := range objects {
+			require.NoError(t, handler.AddEdge(ctx, a, b))
+			require.NoError(t, handler.AddEdge(ctx, b, a))
+			require.NoError(t, handler.Process(ctx, b))
+		}
+		require.NoError(t, handler.Process(ctx, a))
+	}
+
+	mockRelations(deploymentUnstructured, replicaSetUnstructured)
+	mockRelations(replicaSetUnstructured, pod1Unstructured, pod2Unstructured)
+	mockRelations(serviceUnstructured, pod1Unstructured, pod2Unstructured)
+
+	require.NoError(t, handler.AddEdge(ctx, pod1Unstructured, serviceAccountUnstructured))
+	require.NoError(t, handler.AddEdge(ctx, pod2Unstructured, serviceAccountUnstructured))
+	require.NoError(t, handler.Process(ctx, serviceAccountUnstructured))
+
+	mockLinkPath(t, dashConfig, deployment)
+	mockLinkPath(t, dashConfig, replicaSet)
+	mockLinkPath(t, dashConfig, pod1)
+	mockLinkPath(t, dashConfig, pod2)
+	mockLinkPath(t, dashConfig, serviceAccount)
+	mockLinkPath(t, dashConfig, service)
+
+	expectedAdjList := &component.AdjList{
+		string(deployment.UID): {
+			{Node: string(replicaSet.UID), Type: component.EdgeTypeExplicit},
+		},
+		fmt.Sprintf("%s pods", replicaSet.Name): {
+			{Node: string(serviceAccount.UID), Type: component.EdgeTypeExplicit},
+		},
+		string(replicaSet.UID): {
+			{Node: fmt.Sprintf("%s pods", replicaSet.Name), Type: component.EdgeTypeExplicit},
+		},
+		string(service.UID): {
+			{Node: fmt.Sprintf("%s pods", replicaSet.Name), Type: component.EdgeTypeExplicit},
+		},
+	}
+
+	list, err := handler.AdjacencyList()
+	require.NoError(t, err)
+	require.Equal(t, expectedAdjList, list, "adjacency lists don't match")
+
+	objectPath := func(t *testing.T, object runtime.Object) *component.Link {
+		accessor, err := meta.Accessor(object)
+		require.NoError(t, err)
+		name := accessor.GetName()
+		return component.NewLink("", name, path.Join("/", name))
+	}
+
+	podStatus1 := component.NewPodStatus()
+	podStatus1.AddSummary(pod1.Name, nil, component.NodeStatusOK)
+	podStatus1.AddSummary(pod2.Name, nil, component.NodeStatusOK)
+
+	expectedNodes := component.Nodes{
+		string(deployment.UID): {
+			Name:       deployment.Name,
+			APIVersion: deployment.APIVersion,
+			Kind:       deployment.Kind,
+			Status:     component.NodeStatusOK,
+			Path:       objectPath(t, deployment),
+			HasChildren: true,
+			Namespace: "namespace",
+			Created: 	deployment.GetCreationTimestamp().Time.Unix(),
+		},
+		string(replicaSet.UID): {
+			Name:       replicaSet.Name,
+			APIVersion: "apps/v1",
+			Kind:       replicaSet.Kind,
+			Status:     component.NodeStatusOK,
+			Path:       objectPath(t, replicaSet),
+			HasChildren: true,
+			ParentID: string(deployment.UID),
+			Namespace: "namespace",
+			Created: 	replicaSet.GetCreationTimestamp().Time.Unix(),
+		},
+		fmt.Sprintf("%s pods", replicaSet.Name): {
+			Name:       fmt.Sprintf("%s pods", replicaSet.Name),
+			APIVersion: "v1",
+			Kind:       "Pod",
+			Status:     component.NodeStatusOK,
+			Details:    []component.Component{podStatus1},
+			HasChildren: false,
+			ParentID: string(replicaSet.UID),
+			Namespace: "namespace",
+			Created: 	pod1.GetCreationTimestamp().Time.Unix(),
+		},
+		string(serviceAccount.UID): {
+			Name:       serviceAccount.Name,
+			APIVersion: serviceAccount.APIVersion,
+			Kind:       serviceAccount.Kind,
+			Status:     component.NodeStatusOK,
+			Path:       objectPath(t, serviceAccount),
+			HasChildren: false,
+			Namespace: "namespace",
+			Created: 	serviceAccount.GetCreationTimestamp().Time.Unix(),
+		},
+		string(service.UID): {
+			Name:       service.Name,
+			APIVersion: service.APIVersion,
+			Kind:       service.Kind,
+			Status:     component.NodeStatusOK,
+			Path:       objectPath(t, service),
+			HasChildren: false,
+			Namespace: "namespace",
+			Created: 	service.GetCreationTimestamp().Time.Unix(),
+		},
+	}
+
+	nodes, err := handler.Nodes(ctx)
+	require.NoError(t, err)
+
+	testutil.AssertJSONEqual(t, expectedNodes, nodes)
 }

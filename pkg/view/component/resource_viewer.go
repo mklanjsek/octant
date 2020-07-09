@@ -65,6 +65,10 @@ type Node struct {
 	Status     NodeStatus  `json:"status,omitempty"`
 	Details    []Component `json:"details,omitempty"`
 	Path       *Link       `json:"path,omitempty"`
+	ParentID   string      `json:"parentId,omitempty"`
+	HasChildren bool       `json:"hasChildren"`
+	Namespace  string      `json:"namespace,omitempty"`
+	Created    int64 		`json:"created"`
 }
 
 // ResourceViewerConfig is configuration for a resource viewer.

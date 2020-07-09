@@ -1,7 +1,5 @@
 import {storiesOf} from '@storybook/angular';
 import {
-  createEdges,
-  establishRelations,
   REAL_DATA_DAEMON_SET, REAL_DATA_DAEMON_SET2,
   REAL_DATA_DEPLOYMENT,
   REAL_DATA_STATEFUL_SET,
@@ -79,14 +77,9 @@ const testCases= [{title:'Deployment', data: REAL_DATA_DEPLOYMENT},
 
 testCases.map(story =>
   storiesOf('Resources', module).add(`with ${story.title}`, () => {
-    let newShapes= Object.entries(story.data.nodes).map(([key, value]) => ShapeUtils.fromDataStream( key, value));
+    const newShapes= ShapeUtils.loadShapes(story.data);
 
-    if(story.data.edges) {
-      createEdges(newShapes, story.data.edges);
-    }
-    newShapes= establishRelations(newShapes);
-
-    const eles = object('elements', newShapes.map(shape => shape.toNode(newShapes)));
+    const eles = object('elements', newShapes);
 
     return {
       props: {

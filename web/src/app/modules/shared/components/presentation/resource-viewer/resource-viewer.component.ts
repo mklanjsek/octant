@@ -17,10 +17,6 @@ import {
   View,
 } from 'src/app/modules/shared/models/content';
 import { ElementsDefinition, Stylesheet } from 'cytoscape';
-import {
-  createEdges,
-  establishRelations,
-} from '../../../../../../stories/graph.real.data';
 import { ShapeUtils } from '../cytoscape2/shape.utils';
 
 const statusColorCodes = {
@@ -152,20 +148,7 @@ export class ResourceViewerComponent implements OnChanges, AfterViewInit {
 
   generateGraphData2(): ElementsDefinition {
     // console.log('data', JSON.stringify(this.currentView.config));
-    let newShapes = Object.entries(
-      this.currentView.config.nodes
-    ).map(([key, value]) => ShapeUtils.fromDataStream(key, value));
-
-    if (this.currentView.config.edges) {
-      createEdges(newShapes, this.currentView.config.edges);
-    }
-    newShapes = establishRelations(newShapes);
-
-    // @ts-ignore: temporary
-    const allShapes: ElementsDefinition = newShapes.map(
-      shape => shape && shape.toNode(newShapes)
-    );
-    return allShapes;
+    return ShapeUtils.loadShapes(this.currentView.config);
   }
 
   generateGraphData() {

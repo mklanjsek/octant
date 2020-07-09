@@ -14,6 +14,9 @@ type podGroupNode struct {
 
 func (pgn *podGroupNode) Create(ctx context.Context, podGroupName string, objects []unstructured.Unstructured) (*component.Node, error) {
 	podStatus := component.NewPodStatus()
+	var parentId, hasChildren= "", false
+	var namespace= ""
+	var created int64
 
 	for _, object := range objects {
 		if !isObjectPod(&object) {
@@ -30,6 +33,13 @@ func (pgn *podGroupNode) Create(ctx context.Context, podGroupName string, object
 		}
 
 		podStatus.AddSummary(pod.Name, status.Details, status.Status())
+
+		parentId, hasChildren, err = establishRelations(&object)
+		if err != nil {
+			return nil, err
+		}
+		namespace= object.GetNamespace()
+		created= object.GetCreationTimestamp().Time.Unix()
 	}
 
 	node := &component.Node{
@@ -38,6 +48,10 @@ func (pgn *podGroupNode) Create(ctx context.Context, podGroupName string, object
 		Kind:       "Pod",
 		Status:     podStatus.Status(),
 		Details:    []component.Component{podStatus},
+		ParentID:   parentId,
+		HasChildren: hasChildren,
+		Namespace:  namespace,
+		Created:    created,
 	}
 	return node, nil
 }
