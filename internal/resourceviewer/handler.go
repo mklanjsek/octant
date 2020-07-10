@@ -411,6 +411,8 @@ func establishRelations(object runtime.Object) (string, bool, error) {
 		return "", true, nil
 	case "ReplicaSet":
 		return parentId, true, nil
+	case "Job":
+		return "", true, nil
 	case "Pod":
 		return parentId, false, nil
 	}

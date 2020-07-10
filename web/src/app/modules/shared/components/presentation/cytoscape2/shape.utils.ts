@@ -7,6 +7,7 @@ import {
   DaemonSet,
   Deployment,
   Event,
+  Job,
   Namespace,
   Node,
   Pod,
@@ -168,6 +169,13 @@ export abstract class ShapeUtils {
         );
       case 'CustomResourceDefinition':
         return new CRD(
+          id,
+          ShapeUtils.getLabel(data),
+          data.hasChildren,
+          data.parentId
+        );
+      case 'Job':
+        return new Job(
           id,
           ShapeUtils.getLabel(data),
           data.hasChildren,

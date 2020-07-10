@@ -84,7 +84,7 @@ export abstract class Shape extends BaseShape {
 
   getPortPosition(shapes: Shape[], port: Port): { x: number; y: number } {
     const textWidth = this.getTextWidth(port.label) + 10;
-    const { x, y } = this.getPosition(shapes);
+    const { x } = this.getPosition(shapes);
     const portY = this.nextPortPosition(
       shapes,
       port,
@@ -167,8 +167,8 @@ export class Deployment extends Shape {
       id,
       'Deployment',
       label,
-      800,
-      600,
+      700,
+      500,
       'rectangle',
       hasChildren,
       parentId
@@ -178,17 +178,17 @@ export class Deployment extends Shape {
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
     return this.totalReplicas(shapes) > 1
-      ? { x: 1150, y: 450 }
-      : { x: 750, y: 450 };
+      ? { x: 1125, y: 475 }
+      : { x: 800, y: 475 };
   }
 
   preferredPortPosition(shapes: Shape[]): number {
-    return this.preferredPosition(shapes).y / 2;
+    return (2 * this.preferredPosition(shapes).y) / 3;
   }
 
   getWidth(shapes: Shape[]): number {
     return this.totalReplicas(shapes) > 1
-      ? 2 * this.preferedWidth
+      ? 2 * this.preferedWidth - 100
       : this.preferedWidth;
   }
 
@@ -215,8 +215,8 @@ export class DaemonSet extends Shape {
       id,
       'DaemonSet',
       label,
-      600,
-      450,
+      550,
+      400,
       'roundrectangle',
       hasChildren,
       parentId
@@ -225,7 +225,32 @@ export class DaemonSet extends Shape {
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
-    return { x: 850, y: 500 };
+    return { x: 825, y: 475 };
+  }
+}
+
+export class Job extends Shape {
+  constructor(
+    id: string,
+    label: string,
+    hasChildren: boolean,
+    parentId?: string
+  ) {
+    super(
+      id,
+      'DaemonSet',
+      label,
+      550,
+      400,
+      'roundrectangle',
+      hasChildren,
+      parentId
+    );
+    this.classes = 'deployment';
+  }
+
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+    return { x: 825, y: 475 };
   }
 }
 
@@ -240,8 +265,8 @@ export class StatefulSet extends Shape {
       id,
       'StatefulSet',
       label,
-      600,
-      450,
+      550,
+      400,
       'roundrectangle',
       hasChildren,
       parentId
@@ -250,7 +275,7 @@ export class StatefulSet extends Shape {
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
-    return { x: 850, y: 500 };
+    return { x: 825, y: 475 };
   }
 }
 
@@ -500,8 +525,8 @@ export class ReplicaSet extends Shape {
       id,
       'ReplicaSet',
       label,
-      600,
-      400,
+      500,
+      350,
       'rectangle',
       hasChildren,
       parentId
@@ -510,12 +535,12 @@ export class ReplicaSet extends Shape {
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
-    return { x: 800, y: 500 };
+    return { x: 850, y: 500 };
   }
 
   getChildPosition(shapes: Shape[], target: Shape): { x: number; y: number } {
     const defaultPos = this.getPosition(shapes);
-    return { x: defaultPos.x + 75, y: defaultPos.y + 25 };
+    return { x: defaultPos.x + 25, y: defaultPos.y + 25 };
   }
 }
 

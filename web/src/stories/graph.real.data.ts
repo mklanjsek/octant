@@ -684,3 +684,247 @@ export const REAL_DATA_TWO_REPLICAS: NodeDataDef = {
     },
   },
 };
+
+export const REAL_DATA_JOB: NodeDataDef = {
+  'edges': {
+    '22bd5a20-320d-478d-95c1-d86018607fe1': [{
+      'node': '8da7c4b4-bcd2-4805-a868-343831ee7c6f',
+      'edge': 'explicit',
+    }],
+    'contour-certgen-v1.5.0 pods': [{
+      'node': '22bd5a20-320d-478d-95c1-d86018607fe1',
+      'edge': 'explicit',
+    }],
+  },
+  'nodes': {
+    '22bd5a20-320d-478d-95c1-d86018607fe1': {
+      'name': 'contour-certgen',
+      'apiVersion': 'v1',
+      'kind': 'ServiceAccount',
+      'status': 'ok',
+      'details': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': 'v1 ServiceAccount is OK' } }],
+      'path': {
+        'metadata': {
+          'type': 'link',
+          'title': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': '' } }],
+        },
+        'config': {
+          'value': 'contour-certgen',
+          'ref': '/overview/namespace/projectcontour/config-and-storage/service-accounts/contour-certgen',
+        },
+      },
+      'hasChildren': false,
+      'namespace': 'projectcontour',
+      'created': 1592934214,
+    },
+    '8da7c4b4-bcd2-4805-a868-343831ee7c6f': {
+      'name': 'contour-certgen-token-pxq5j',
+      'apiVersion': 'v1',
+      'kind': 'Secret',
+      'status': 'ok',
+      'details': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': 'v1 Secret is OK' } }],
+      'path': {
+        'metadata': {
+          'type': 'link',
+          'title': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': '' } }],
+        },
+        'config': {
+          'value': 'contour-certgen-token-pxq5j',
+          'ref': '/overview/namespace/projectcontour/config-and-storage/secrets/contour-certgen-token-pxq5j',
+        },
+      },
+      'hasChildren': false,
+      'namespace': 'projectcontour',
+      'created': 1592934214,
+    },
+    'cd0c78b8-99c7-4230-bf7b-e77a857d8499': {
+      'name': 'contour-certgen-v1.5.0',
+      'apiVersion': 'batch/v1',
+      'kind': 'Job',
+      'status': 'ok',
+      'details': [{
+        'metadata': { 'type': 'text' },
+        'config': { 'value': 'Job has succeeded 1 time' },
+      }, { 'metadata': { 'type': 'text' }, 'config': { 'value': 'Job completed in 5s' } }],
+      'path': {
+        'metadata': {
+          'type': 'link',
+          'title': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': '' } }],
+        },
+        'config': {
+          'value': 'contour-certgen-v1.5.0',
+          'ref': '/overview/namespace/projectcontour/workloads/jobs/contour-certgen-v1.5.0',
+        },
+      },
+      'hasChildren': true,
+      'namespace': 'projectcontour',
+      'created': 1592934215,
+    },
+    'contour-certgen-v1.5.0 pods': {
+      'name': 'contour-certgen-v1.5.0 pods',
+      'apiVersion': 'v1',
+      'kind': 'Pod',
+      'status': 'warning',
+      'details': [{
+        'metadata': { 'type': 'podStatus' },
+        'config': {
+          'pods': {
+            'contour-certgen-v1.5.0-8qxhm': {
+              'details': [{
+                'metadata': { 'type': 'text' },
+                'config': { 'value': '' },
+              }], 'status': 'warning',
+            },
+          },
+        },
+      }],
+      'parentId': 'cd0c78b8-99c7-4230-bf7b-e77a857d8499',
+      'hasChildren': false,
+      'namespace': 'projectcontour',
+      'created': 1592934215,
+    },
+  },
+};
+
+export const REAL_DATA_TWO_SECRETS: NodeDataDef = {
+  'edges': {
+    '51ba286e-2610-4c95-bb91-ab6d0b7bf563': [{
+      'node': '3e040fc9-b214-465a-b465-b6f3ada2d910',
+      'edge': 'explicit',
+    }, { 'node': '6c7c57e7-4b67-4ee9-a71c-30fb1e13e86d', 'edge': 'explicit' }],
+    'envoy pods': [{
+      'node': '51ba286e-2610-4c95-bb91-ab6d0b7bf563',
+      'edge': 'explicit',
+    }, { 'node': 'd0fb763c-32a7-4c14-a105-011664e93e72', 'edge': 'explicit' }],
+  },
+  'nodes': {
+    '3e040fc9-b214-465a-b465-b6f3ada2d910': {
+      'name': 'envoycert',
+      'apiVersion': 'v1',
+      'kind': 'Secret',
+      'status': 'ok',
+      'details': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': 'v1 Secret is OK' } }],
+      'path': {
+        'metadata': {
+          'type': 'link',
+          'title': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': '' } }],
+        },
+        'config': {
+          'value': 'envoycert',
+          'ref': '/overview/namespace/projectcontour/config-and-storage/secrets/envoycert',
+        },
+      },
+      'hasChildren': false,
+      'namespace': 'projectcontour',
+      'created': 1592934220,
+    },
+    '51ba286e-2610-4c95-bb91-ab6d0b7bf563': {
+      'name': 'envoy',
+      'apiVersion': 'v1',
+      'kind': 'ServiceAccount',
+      'status': 'ok',
+      'details': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': 'v1 ServiceAccount is OK' } }],
+      'path': {
+        'metadata': {
+          'type': 'link',
+          'title': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': '' } }],
+        },
+        'config': {
+          'value': 'envoy',
+          'ref': '/overview/namespace/projectcontour/config-and-storage/service-accounts/envoy',
+        },
+      },
+      'hasChildren': false,
+      'namespace': 'projectcontour',
+      'created': 1592934213,
+    },
+    '6c7c57e7-4b67-4ee9-a71c-30fb1e13e86d': {
+      'name': 'envoy-token-vw5h5',
+      'apiVersion': 'v1',
+      'kind': 'Secret',
+      'status': 'ok',
+      'details': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': 'v1 Secret is OK' } }],
+      'path': {
+        'metadata': {
+          'type': 'link',
+          'title': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': '' } }],
+        },
+        'config': {
+          'value': 'envoy-token-vw5h5',
+          'ref': '/overview/namespace/projectcontour/config-and-storage/secrets/envoy-token-vw5h5',
+        },
+      },
+      'hasChildren': false,
+      'namespace': 'projectcontour',
+      'created': 1592934213,
+    },
+    'd0fb763c-32a7-4c14-a105-011664e93e72': {
+      'name': 'envoy',
+      'apiVersion': 'v1',
+      'kind': 'Service',
+      'status': 'ok',
+      'details': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': 'Service is OK' } }],
+      'path': {
+        'metadata': {
+          'type': 'link',
+          'title': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': '' } }],
+        },
+        'config': {
+          'value': 'envoy',
+          'ref': '/overview/namespace/projectcontour/discovery-and-load-balancing/services/envoy',
+        },
+      },
+      'hasChildren': false,
+      'namespace': 'projectcontour',
+      'created': 1592934216,
+    },
+    'eb588004-f2d3-4bb9-b3ff-03e6bba3a216': {
+      'name': 'envoy',
+      'apiVersion': 'apps/v1',
+      'kind': 'DaemonSet',
+      'status': 'ok',
+      'details': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': 'Daemon Set is OK' } }],
+      'path': {
+        'metadata': {
+          'type': 'link',
+          'title': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': '' } }],
+        }, 'config': { 'value': 'envoy', 'ref': '/overview/namespace/projectcontour/workloads/daemon-sets/envoy' },
+      },
+      'hasChildren': true,
+      'namespace': 'projectcontour',
+      'created': 1592934217,
+    },
+    'envoy pods': {
+      'name': 'envoy pods',
+      'apiVersion': 'v1',
+      'kind': 'Pod',
+      'status': 'ok',
+      'details': [{
+        'metadata': { 'type': 'podStatus' },
+        'config': {
+          'pods': {
+            'envoy-5b9zx': {
+              'details': [{
+                'metadata': { 'type': 'text' },
+                'config': { 'value': '' },
+              }], 'status': 'ok',
+            },
+            'envoy-8cp4j': {
+              'details': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': '' } }],
+              'status': 'ok',
+            },
+            'envoy-v5t6q': {
+              'details': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': '' } }],
+              'status': 'ok',
+            },
+          },
+        },
+      }],
+      'parentId': 'eb588004-f2d3-4bb9-b3ff-03e6bba3a216',
+      'hasChildren': false,
+      'namespace': 'projectcontour',
+      'created': 1592934217,
+    },
+  },
+}
+

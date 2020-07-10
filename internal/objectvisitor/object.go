@@ -106,7 +106,7 @@ func (o *Object) Visit(ctx context.Context, object *unstructured.Unstructured, h
 }
 
 func (o *Object) isEdgeRedundant(object *unstructured.Unstructured, owner *unstructured.Unstructured) bool {
-	toBeRemoved := map[string]bool{"ReplicaSet": true, "Deployment": true, "StatefulSet": true, "DaemonSet": true}
+	toBeRemoved := map[string]bool{"ReplicaSet": true, "Deployment": true, "StatefulSet": true, "DaemonSet": true, "Job": true}
 
 	return toBeRemoved[object.GetKind()] || toBeRemoved[owner.GetKind()]
 }
