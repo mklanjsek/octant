@@ -2,7 +2,7 @@ import {storiesOf} from '@storybook/angular';
 import {
   REAL_DATA_DAEMON_SET, REAL_DATA_DAEMON_SET2,
   REAL_DATA_DEPLOYMENT,
-  REAL_DATA_STATEFUL_SET,
+  REAL_DATA_STATEFUL_SET, REAL_DATA_TWO_REPLICAS,
 } from './graph.real.data';
 import {object} from "@storybook/addon-knobs";
 import {
@@ -73,6 +73,7 @@ const testCases= [{title:'Deployment', data: REAL_DATA_DEPLOYMENT},
  {title:'StatefulSet', data: REAL_DATA_STATEFUL_SET},
  {title:'DaemonSet', data: REAL_DATA_DAEMON_SET},
  {title:'single DaemonSet', data: REAL_DATA_DAEMON_SET2},
+ {title:'two ReplicaSets', data: REAL_DATA_TWO_REPLICAS},
 ];
 
 testCases.map(story =>

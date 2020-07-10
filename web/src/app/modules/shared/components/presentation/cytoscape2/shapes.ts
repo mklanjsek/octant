@@ -5,8 +5,8 @@ export abstract class Shape extends BaseShape {
     id: string,
     kind: string,
     public label: string,
-    public width: any,
-    public height: any,
+    public preferedWidth: any,
+    public preferedHeight: any,
     public shape: string,
     public hasChildren: boolean,
     public parentId?: string
@@ -21,12 +21,20 @@ export abstract class Shape extends BaseShape {
 
   ports: Shape[] = [];
 
-  abstract preferredPosition(): { x: number; y: number };
+  abstract preferredPosition(shapes: Shape[]): { x: number; y: number };
 
-  nextPortPosition(shapes: BaseShape[], port: Port, prefered: number): number {
+  getWidth(shapes: Shape[]): number {
+    return this.preferedWidth;
+  }
+
+  getHeight(shapes: Shape[]): number {
+    return this.preferedHeight;
+  }
+
+  nextPortPosition(shapes: Shape[], port: Port, preferred: number): number {
     if (this.ports.length === 0) {
       this.ports.push(port);
-      return prefered;
+      return preferred;
     }
 
     if (this.ports.includes(port)) {
@@ -38,21 +46,40 @@ export abstract class Shape extends BaseShape {
         shape.parentId === this.id && shape.location === port.location
     ).length;
     this.ports.push(port);
-    return total > 0 ? prefered + this.height / 3 : prefered;
+    return total > 0 ? preferred + this.getHeight(shapes) / 3 : preferred;
   }
 
-  preferredPortPosition(shapes: BaseShape[]): number {
-    return this.preferredPosition().y - this.height / 6;
+  preferredPortPosition(shapes: Shape[]): number {
+    return this.preferredPosition(shapes).y - this.getHeight(shapes) / 6;
   }
 
-  getPosition(shapes: BaseShape[]): { x: number; y: number } {
-    const preferred = this.preferredPosition();
+  getPosition(shapes: Shape[]): { x: number; y: number } {
+    const preferred = this.preferredPosition(shapes);
     const sameKind = shapes.filter(shape => shape.kind === this.kind);
+    if (sameKind.length > 1 && this.parentId) {
+      const parentNode = this.getParent(shapes);
+      return parentNode.getChildPosition(shapes, this);
+    }
+
     const isFirst = sameKind.length > 1 && sameKind[0].id === this.id;
 
     return sameKind.length > 1 && !isFirst
-      ? { x: preferred.x, y: preferred.y + (4 * this.height) / 3 }
+      ? { x: preferred.x, y: preferred.y + (4 * this.getHeight(shapes)) / 3 }
       : preferred;
+  }
+
+  getChildPosition(shapes: Shape[], target: Shape): { x: number; y: number } {
+    const defaultPos = target.preferredPosition(shapes);
+    const childIndex = shapes
+      .filter((shape: Shape) => shape.parentId === this.id)
+      .findIndex(shape => shape.id === target.id);
+
+    return childIndex === 0
+      ? defaultPos
+      : {
+          x: defaultPos.x + (5 * target.getWidth(shapes)) / 4,
+          y: defaultPos.y,
+        };
   }
 
   getPortPosition(shapes: Shape[], port: Port): { x: number; y: number } {
@@ -67,9 +94,9 @@ export abstract class Shape extends BaseShape {
     switch (port.location) {
       default:
       case 'left':
-        return { x: x - this.width / 2 + textWidth / 2, y: portY };
+        return { x: x - this.getWidth(shapes) / 2 + textWidth / 2, y: portY };
       case 'right':
-        return { x: x + this.width / 2 - textWidth / 2, y: portY };
+        return { x: x + this.getWidth(shapes) / 2 - textWidth / 2, y: portY };
     }
   }
 
@@ -96,16 +123,17 @@ export abstract class Shape extends BaseShape {
     return this.element.offsetWidth;
   }
 
-  toNode(shapes: BaseShape[]) {
+  toNode(shapes: Shape[]) {
+    const { x, y } = this.getPosition(shapes);
     return {
       data: {
         id: this.id,
         label: this.label,
         owner: this.parentId,
-        width: this.width,
-        height: this.height,
-        x: this.getPosition(shapes).x,
-        y: this.getPosition(shapes).y,
+        width: this.getWidth(shapes),
+        height: this.getHeight(shapes),
+        x,
+        y,
         hasChildren: this.hasChildren,
         shape: this.shape,
       },
@@ -118,6 +146,13 @@ export abstract class Shape extends BaseShape {
       pannable: false,
       classes: this.classes,
     };
+  }
+
+  protected getParent(shapes: Shape[]) {
+    const parentNode: Shape = shapes.find(
+      (shape: Shape) => shape.id === this.parentId
+    );
+    return parentNode;
   }
 }
 
@@ -141,12 +176,31 @@ export class Deployment extends Shape {
     this.classes = 'deployment';
   }
 
-  preferredPosition(): { x: number; y: number } {
-    return { x: 750, y: 450 };
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+    return this.totalReplicas(shapes) > 1
+      ? { x: 1150, y: 450 }
+      : { x: 750, y: 450 };
   }
 
-  preferredPortPosition(shapes: BaseShape[]): number {
-    return this.preferredPosition().y / 2;
+  preferredPortPosition(shapes: Shape[]): number {
+    return this.preferredPosition(shapes).y / 2;
+  }
+
+  getWidth(shapes: Shape[]): number {
+    return this.totalReplicas(shapes) > 1
+      ? 2 * this.preferedWidth
+      : this.preferedWidth;
+  }
+
+  getHeight(shapes: Shape[]): number {
+    return this.preferedHeight;
+  }
+
+  private totalReplicas(shapes: Shape[]): number {
+    const totalChildren = shapes.filter(
+      shape => shape.parentId === this.id && shape.kind === 'ReplicaSet'
+    ).length;
+    return totalChildren;
   }
 }
 
@@ -170,7 +224,7 @@ export class DaemonSet extends Shape {
     this.classes = 'deployment';
   }
 
-  preferredPosition(): { x: number; y: number } {
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
     return { x: 850, y: 500 };
   }
 }
@@ -195,7 +249,7 @@ export class StatefulSet extends Shape {
     this.classes = 'deployment';
   }
 
-  preferredPosition(): { x: number; y: number } {
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
     return { x: 850, y: 500 };
   }
 }
@@ -220,7 +274,7 @@ export class Secret extends Shape {
     this.classes = 'secret';
   }
 
-  preferredPosition(): { x: number; y: number } {
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
     return { x: 100, y: 1000 };
   }
 }
@@ -245,7 +299,7 @@ export class ServiceAccount extends Shape {
     this.classes = 'secret';
   }
 
-  preferredPosition(): { x: number; y: number } {
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
     return { x: 600, y: 1000 };
   }
 }
@@ -270,7 +324,7 @@ export class Service extends Shape {
     this.classes = 'secret';
   }
 
-  preferredPosition(): { x: number; y: number } {
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
     return { x: 0, y: 525 };
   }
 }
@@ -286,7 +340,7 @@ export class ConfigMap extends Shape {
     this.classes = 'secret';
   }
 
-  preferredPosition(): { x: number; y: number } {
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
     return { x: 1100, y: 1000 };
   }
 }
@@ -302,7 +356,7 @@ export class Node extends Shape {
     this.classes = 'secret';
   }
 
-  preferredPosition(): { x: number; y: number } {
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
     return { x: 0, y: 0 };
   }
 }
@@ -318,7 +372,7 @@ export class Namespace extends Shape {
     this.classes = 'secret';
   }
 
-  preferredPosition(): { x: number; y: number } {
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
     return { x: 0, y: 0 };
   }
 }
@@ -333,7 +387,7 @@ export class Event extends Shape {
     super(id, 'Event', label, 350, 200, 'rectangle', hasChildren, parentId);
   }
 
-  preferredPosition(): { x: number; y: number } {
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
     return { x: 0, y: 0 };
   }
 }
@@ -357,7 +411,7 @@ export class ClusterRole extends Shape {
     );
   }
 
-  preferredPosition(): { x: number; y: number } {
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
     return { x: 0, y: 0 };
   }
 }
@@ -381,7 +435,7 @@ export class ClusterRoleBinding extends Shape {
     );
   }
 
-  preferredPosition(): { x: number; y: number } {
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
     return { x: 0, y: 0 };
   }
 }
@@ -405,7 +459,7 @@ export class CRD extends Shape {
     );
   }
 
-  preferredPosition(): { x: number; y: number } {
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
     return { x: 0, y: 0 };
   }
 }
@@ -430,7 +484,7 @@ export class Unknown extends Shape {
     this.classes = 'secret';
   }
 
-  preferredPosition(): { x: number; y: number } {
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
     return { x: 0, y: 0 };
   }
 }
@@ -455,8 +509,13 @@ export class ReplicaSet extends Shape {
     this.classes = 'replicaset';
   }
 
-  preferredPosition(): { x: number; y: number } {
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
     return { x: 800, y: 500 };
+  }
+
+  getChildPosition(shapes: Shape[], target: Shape): { x: number; y: number } {
+    const defaultPos = this.getPosition(shapes);
+    return { x: defaultPos.x + 75, y: defaultPos.y + 25 };
   }
 }
 
@@ -471,7 +530,7 @@ export class Pod extends Shape {
     this.classes = 'pod';
   }
 
-  preferredPosition(): { x: number; y: number } {
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
     return { x: 875, y: 525 };
   }
 }
@@ -492,14 +551,12 @@ export class Port extends Shape {
     return false;
   }
 
-  preferredPosition(): { x: number; y: number } {
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
     return { x: 750, y: 450 };
   }
 
   getPosition(shapes: Shape[]): { x: number; y: number } {
-    const parentNode: Shape = shapes.find(
-      (shape: Shape) => shape.id === this.parentId
-    );
+    const parentNode = this.getParent(shapes);
     const portPosition = parentNode.getPortPosition(shapes, this);
     this.x = portPosition.x;
     this.y = portPosition.y;

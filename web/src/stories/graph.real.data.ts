@@ -483,3 +483,204 @@ export const REAL_DATA_DEPLOYMENT: NodeDataDef = {
     },
   },
 };
+
+export const REAL_DATA_TWO_REPLICAS: NodeDataDef = {
+  edges: {
+    '96dcb87c-0d5e-49f8-a084-cf79e054a4bd': [
+      {
+        node: 'elasticsearch-dbf4fc4df pods',
+        edge: 'explicit',
+      },
+    ],
+    'a4e5517e-0563-4158-88d3-a0492fe18cd5': [
+      { node: '3c81e771-d723-403d-a19b-be7ce87ff7f2', edge: 'explicit' },
+    ],
+    'elasticsearch-dbf4fc4df pods': [
+      { node: 'a4e5517e-0563-4158-88d3-a0492fe18cd5', edge: 'explicit' },
+    ],
+  },
+  nodes: {
+    '04ddee7a-342c-46b0-8c57-ec8682aff2ef': {
+      name: 'elasticsearch-1',
+      apiVersion: 'apps/v1',
+      kind: 'ReplicaSet',
+      status: 'ok',
+      details: [
+        { metadata: { type: 'text' }, config: { value: 'Replica Set is OK' } },
+      ],
+      path: {
+        metadata: {
+          type: 'link',
+          title: [{ metadata: { type: 'text' }, config: { value: '' } }],
+        },
+        config: {
+          value: 'elasticsearch-dbf4fc4df',
+          ref:
+            '/overview/namespace/milan/workloads/replica-sets/elasticsearch-dbf4fc4df',
+        },
+      },
+      hasChildren: true,
+      parentId: '5b287e6a-94f2-4ac3-8241-17fd87d3a114',
+    },
+    '04ddee7a-342c-46b0-8c57-ec8682aff2ff': {
+      name: 'elasticsearch-2',
+      apiVersion: 'apps/v1',
+      kind: 'ReplicaSet',
+      status: 'ok',
+      details: [
+        { metadata: { type: 'text' }, config: { value: 'Replica Set is OK' } },
+      ],
+      path: {
+        metadata: {
+          type: 'link',
+          title: [{ metadata: { type: 'text' }, config: { value: '' } }],
+        },
+        config: {
+          value: 'elasticsearch-dbf4fc4df',
+          ref:
+            '/overview/namespace/milan/workloads/replica-sets/elasticsearch-dbf4fc4df',
+        },
+      },
+      hasChildren: true,
+      parentId: '5b287e6a-94f2-4ac3-8241-17fd87d3a114',
+    },
+    '3c81e771-d723-403d-a19b-be7ce87ff7f2': {
+      name: 'default-token-4dln7',
+      apiVersion: 'v1',
+      kind: 'Secret',
+      status: 'ok',
+      details: [
+        { metadata: { type: 'text' }, config: { value: 'v1 Secret is OK' } },
+      ],
+      path: {
+        metadata: {
+          type: 'link',
+          title: [{ metadata: { type: 'text' }, config: { value: '' } }],
+        },
+        config: {
+          value: 'default-token-4dln7',
+          ref:
+            '/overview/namespace/milan/config-and-storage/secrets/default-token-4dln7',
+        },
+      },
+      hasChildren: false,
+    },
+    '5b287e6a-94f2-4ac3-8241-17fd87d3a114': {
+      name: 'elasticsearch',
+      apiVersion: 'apps/v1',
+      kind: 'Deployment',
+      status: 'ok',
+      details: [
+        { metadata: { type: 'text' }, config: { value: 'Deployment is OK' } },
+      ],
+      path: {
+        metadata: {
+          type: 'link',
+          title: [{ metadata: { type: 'text' }, config: { value: '' } }],
+        },
+        config: {
+          value: 'elasticsearch',
+          ref: '/overview/namespace/milan/workloads/deployments/elasticsearch',
+        },
+      },
+      hasChildren: true,
+    },
+    '96dcb87c-0d5e-49f8-a084-cf79e054a4bd': {
+      name: 'elasticsearch',
+      apiVersion: 'v1',
+      kind: 'Service',
+      status: 'ok',
+      details: [
+        { metadata: { type: 'text' }, config: { value: 'Service is OK' } },
+      ],
+      path: {
+        metadata: {
+          type: 'link',
+          title: [{ metadata: { type: 'text' }, config: { value: '' } }],
+        },
+        config: {
+          value: 'elasticsearch',
+          ref:
+            '/overview/namespace/milan/discovery-and-load-balancing/services/elasticsearch',
+        },
+      },
+      hasChildren: false,
+    },
+    'a4e5517e-0563-4158-88d3-a0492fe18cd5': {
+      name: 'default',
+      apiVersion: 'v1',
+      kind: 'ServiceAccount',
+      status: 'ok',
+      details: [
+        {
+          metadata: { type: 'text' },
+          config: { value: 'v1 ServiceAccount is OK' },
+        },
+      ],
+      path: {
+        metadata: {
+          type: 'link',
+          title: [{ metadata: { type: 'text' }, config: { value: '' } }],
+        },
+        config: {
+          value: 'default',
+          ref:
+            '/overview/namespace/milan/config-and-storage/service-accounts/default',
+        },
+      },
+      hasChildren: false,
+    },
+    'elasticsearch-dbf4fc4df pods': {
+      name: 'elasticsearch-dbf4fc4df pods',
+      apiVersion: 'v1',
+      kind: 'Pod',
+      status: 'ok',
+      details: [
+        {
+          metadata: { type: 'podStatus' },
+          config: {
+            pods: {
+              'elasticsearch-dbf4fc4df-t4dlh': {
+                details: [
+                  {
+                    metadata: { type: 'text' },
+                    config: { value: '' },
+                  },
+                ],
+                status: 'ok',
+              },
+            },
+          },
+        },
+      ],
+      hasChildren: false,
+      parentId: '04ddee7a-342c-46b0-8c57-ec8682aff2ef',
+    },
+    'elasticsearch-pod2': {
+      name: 'elasticsearch-pod2',
+      apiVersion: 'v1',
+      kind: 'Pod',
+      status: 'ok',
+      details: [
+        {
+          metadata: { type: 'podStatus' },
+          config: {
+            pods: {
+              'elasticsearch-dbf4fc4df-t4dlh': {
+                details: [
+                  {
+                    metadata: { type: 'text' },
+                    config: { value: '' },
+                  },
+                ],
+                status: 'ok',
+              },
+            },
+          },
+        },
+      ],
+      hasChildren: false,
+      parentId: '04ddee7a-342c-46b0-8c57-ec8682aff2ff',
+    },
+  },
+};
