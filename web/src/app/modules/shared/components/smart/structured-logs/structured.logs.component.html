@@ -1,0 +1,85 @@
+<div class="app-logs">
+<div class="log-actions">
+<div *ngIf="false" class="clr-filter">
+  <div>
+    <label class="clr-control-label">Filter</label>
+    <div class="clr-filter-input">
+      <input
+        clrInput
+        class="clr-control-container"
+        (keyup.enter)="onNextHighlight()"
+        placeholder="no filter"
+        name="input"
+        [(ngModel)]="filterText"
+      />
+    </div>
+  </div>
+  <div class="clr-filter-buttons">
+    <button
+      id="button-prev"
+      class="btn btn-icon clr-filter-btn"
+      type="button"
+      (click)="onPreviousHighlight()"
+    >
+      <
+    </button>
+    <button
+      id="button-next"
+      class="btn btn-icon clr-filter-btn"
+      type="button"
+      (click)="onNextHighlight()"
+    >
+      >
+    </button>
+  </div>
+</div>
+</div>
+  <div class="container-logs">
+    <clr-datagrid>
+
+      <ng-container *ngFor="let column of columns; trackBy:identifyColumn; let i = index;">
+        <clr-dg-column *ngIf="isColumnLevel(i)" class="column-level">
+          <ng-template clrDgHideableColumn [clrDgHidden]="isColumnHidden(i)">
+            {{column}}
+          </ng-template>
+        </clr-dg-column>
+        <clr-dg-column *ngIf="!isColumnLevel(i)">
+          <ng-template clrDgHideableColumn [clrDgHidden]="isColumnHidden(i)">
+          {{column}}
+          </ng-template>
+        </clr-dg-column>
+      </ng-container>
+
+      <clr-dg-row *clrDgItems="let log of logs; trackBy: identifyRow">
+        <ng-container *ngFor="let column of columns; trackBy:identifyColumn; let i = index;">
+            <clr-dg-cell *ngIf="isColumnLevel(i)">
+              <clr-icon [attr.shape]="getLevelIcon(log[column])"></clr-icon>
+            </clr-dg-cell>
+            <clr-dg-cell *ngIf="isColumnTime(i)">{{log[column] | date: timeFormat}}</clr-dg-cell>
+            <clr-dg-cell class= "logs-cell" *ngIf="!isColumnLevel(i) && !isColumnTime(i)">{{log[column]}}</clr-dg-cell>
+        </ng-container>
+
+        <clr-dg-row-detail *clrIfExpanded>
+          <table class="table table-vertical expander">
+            <tbody>
+              <ng-container *ngFor="let column of columns; trackBy:identifyColumn; let i = index;">
+                <tr *ngIf="isColumnHidden(i)">
+                  <th>{{column}}</th>
+                  <td>{{log[column]}}</td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </clr-dg-row-detail>
+
+      </clr-dg-row>
+      <clr-dg-footer>
+        <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="logs?.length">
+          <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">Log entries per page</clr-dg-page-size>
+            {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+              of {{pagination.totalItems}} log entries
+        </clr-dg-pagination>
+      </clr-dg-footer>
+    </clr-datagrid>
+  </div>
+</div>

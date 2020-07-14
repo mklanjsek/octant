@@ -49,6 +49,7 @@ import { PodStatusComponent } from './components/presentation/pod-status/pod-sta
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TerminalComponent } from './components/smart/terminal/terminal.component';
 import { LogsComponent } from './components/smart/logs/logs.component';
+import { StructuredLogsComponent } from './components/smart/structured-logs/structured.logs.component';
 import { PortsComponent } from './components/presentation/ports/ports.component';
 import { FiltersComponent } from './components/smart/filters/filters.component';
 import { HeptagonComponent } from './components/smart/heptagon/heptagon.component';
@@ -109,6 +110,7 @@ import { ContentTextFilterComponent } from './components/presentation/content-te
     ListComponent,
     LoadingComponent,
     LogsComponent,
+    StructuredLogsComponent,
     ObjectStatusComponent,
     PodStatusComponent,
     PortForwardComponent,
@@ -187,6 +189,7 @@ import { ContentTextFilterComponent } from './components/presentation/content-te
     ListComponent,
     LoadingComponent,
     LogsComponent,
+    StructuredLogsComponent,
     ObjectStatusComponent,
     PodStatusComponent,
     PortForwardComponent,
