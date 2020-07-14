@@ -928,3 +928,242 @@ export const REAL_DATA_TWO_SECRETS: NodeDataDef = {
   },
 }
 
+export const REAL_DATA_INGRESS: NodeDataDef = {
+  'edges': {
+    '9243a931-5d84-423e-ac92-2451503b7c79': [{
+      'node': '00dad221-7702-4c1e-ad92-923aa259b72d',
+      'edge': 'explicit',
+    }, { 'node': 'web-557f59c6cf pods', 'edge': 'explicit' }],
+    'dbe03b1c-d812-4dda-a27e-13bf406e58a3': [{
+      'node': '2b55d216-7bf4-4577-8418-9a6619f6e15e',
+      'edge': 'explicit',
+    }, { 'node': 'web-557f59c6cf pods', 'edge': 'explicit' }],
+    'f6232bfb-8df0-463d-8dc1-15ca5e46499e': [{
+      'node': '2b55d216-7bf4-4577-8418-9a6619f6e15e',
+      'edge': 'explicit',
+    }, { 'node': 'web2-644ffbbb4 pods', 'edge': 'explicit' }],
+    'web2-644ffbbb4 pods': [{ 'node': '9243a931-5d84-423e-ac92-2451503b7c79', 'edge': 'explicit' }],
+  },
+  'nodes': {
+    '00dad221-7702-4c1e-ad92-923aa259b72d': {
+      'name': 'default-token-fssw4',
+      'apiVersion': 'v1',
+      'kind': 'Secret',
+      'status': 'ok',
+      'details': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': 'v1 Secret is OK' } }],
+      'path': {
+        'metadata': {
+          'type': 'link',
+          'title': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': '' } }],
+        },
+        'config': {
+          'value': 'default-token-fssw4',
+          'ref': '/overview/namespace/default/config-and-storage/secrets/default-token-fssw4',
+        },
+      },
+      'hasChildren': false,
+      'namespace': 'default',
+      'created': 1593536359,
+    },
+    '1c67d3ba-2a02-4908-a994-ad9634b558a5': {
+      'name': 'web-557f59c6cf',
+      'apiVersion': 'apps/v1',
+      'kind': 'ReplicaSet',
+      'status': 'warning',
+      'details': [{
+        'metadata': { 'type': 'text' },
+        'config': { 'value': 'Expected 1 replicas, but 0 are available' },
+      }],
+      'path': {
+        'metadata': {
+          'type': 'link',
+          'title': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': '' } }],
+        },
+        'config': {
+          'value': 'web-557f59c6cf',
+          'ref': '/overview/namespace/default/workloads/replica-sets/web-557f59c6cf',
+        },
+      },
+      'parentId': '8f2bd70e-4ae6-4ac5-845e-7aab86f88869',
+      'hasChildren': true,
+      'namespace': 'default',
+      'created': 1594405142,
+    },
+    '2b55d216-7bf4-4577-8418-9a6619f6e15e': {
+      'name': 'example-ingress',
+      'apiVersion': 'extensions/v1beta1',
+      'kind': 'Ingress',
+      'status': 'ok',
+      'details': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': 'Ingress is OK' } }],
+      'path': {
+        'metadata': {
+          'type': 'link',
+          'title': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': '' } }],
+        },
+        'config': {
+          'value': 'example-ingress',
+          'ref': '/overview/namespace/default/discovery-and-load-balancing/ingresses/example-ingress',
+        },
+      },
+      'hasChildren': false,
+      'namespace': 'default',
+      'created': 1594405535,
+    },
+    '42880eec-d627-4cd2-aede-71124375bd28': {
+      'name': 'web2-644ffbbb4',
+      'apiVersion': 'apps/v1',
+      'kind': 'ReplicaSet',
+      'status': 'warning',
+      'details': [{
+        'metadata': { 'type': 'text' },
+        'config': { 'value': 'Expected 1 replicas, but 0 are available' },
+      }],
+      'path': {
+        'metadata': {
+          'type': 'link',
+          'title': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': '' } }],
+        },
+        'config': {
+          'value': 'web2-644ffbbb4',
+          'ref': '/overview/namespace/default/workloads/replica-sets/web2-644ffbbb4',
+        },
+      },
+      'parentId': 'e0e64786-73a7-4d2b-9051-6defb80006a6',
+      'hasChildren': true,
+      'namespace': 'default',
+      'created': 1594405658,
+    },
+    '8f2bd70e-4ae6-4ac5-845e-7aab86f88869': {
+      'name': 'web',
+      'apiVersion': 'apps/v1',
+      'kind': 'Deployment',
+      'status': 'error',
+      'details': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': 'No replicas exist for this deployment' } }],
+      'path': {
+        'metadata': {
+          'type': 'link',
+          'title': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': '' } }],
+        }, 'config': { 'value': 'web', 'ref': '/overview/namespace/default/workloads/deployments/web' },
+      },
+      'hasChildren': true,
+      'namespace': 'default',
+      'created': 1594405142,
+    },
+    '9243a931-5d84-423e-ac92-2451503b7c79': {
+      'name': 'default',
+      'apiVersion': 'v1',
+      'kind': 'ServiceAccount',
+      'status': 'ok',
+      'details': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': 'v1 ServiceAccount is OK' } }],
+      'path': {
+        'metadata': {
+          'type': 'link',
+          'title': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': '' } }],
+        },
+        'config': {
+          'value': 'default',
+          'ref': '/overview/namespace/default/config-and-storage/service-accounts/default',
+        },
+      },
+      'hasChildren': false,
+      'namespace': 'default',
+      'created': 1593536359,
+    },
+    'dbe03b1c-d812-4dda-a27e-13bf406e58a3': {
+      'name': 'web',
+      'apiVersion': 'v1',
+      'kind': 'Service',
+      'status': 'warning',
+      'details': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': 'Service has no endpoint addresses' } }],
+      'path': {
+        'metadata': {
+          'type': 'link',
+          'title': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': '' } }],
+        }, 'config': { 'value': 'web', 'ref': '/overview/namespace/default/discovery-and-load-balancing/services/web' },
+      },
+      'hasChildren': false,
+      'namespace': 'default',
+      'created': 1594405157,
+    },
+    'e0e64786-73a7-4d2b-9051-6defb80006a6': {
+      'name': 'web2',
+      'apiVersion': 'apps/v1',
+      'kind': 'Deployment',
+      'status': 'error',
+      'details': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': 'No replicas exist for this deployment' } }],
+      'path': {
+        'metadata': {
+          'type': 'link',
+          'title': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': '' } }],
+        }, 'config': { 'value': 'web2', 'ref': '/overview/namespace/default/workloads/deployments/web2' },
+      },
+      'hasChildren': true,
+      'namespace': 'default',
+      'created': 1594405658,
+    },
+    'f6232bfb-8df0-463d-8dc1-15ca5e46499e': {
+      'name': 'web2',
+      'apiVersion': 'v1',
+      'kind': 'Service',
+      'status': 'warning',
+      'details': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': 'Service has no endpoint addresses' } }],
+      'path': {
+        'metadata': {
+          'type': 'link',
+          'title': [{ 'metadata': { 'type': 'text' }, 'config': { 'value': '' } }],
+        },
+        'config': { 'value': 'web2', 'ref': '/overview/namespace/default/discovery-and-load-balancing/services/web2' },
+      },
+      'hasChildren': false,
+      'namespace': 'default',
+      'created': 1594405669,
+    },
+    'web-557f59c6cf pods': {
+      'name': 'web-557f59c6cf pods',
+      'apiVersion': 'v1',
+      'kind': 'Pod',
+      'status': 'warning',
+      'details': [{
+        'metadata': { 'type': 'podStatus' },
+        'config': {
+          'pods': {
+            'web-557f59c6cf-sh8ww': {
+              'details': [{
+                'metadata': { 'type': 'text' },
+                'config': { 'value': '' },
+              }], 'status': 'warning',
+            },
+          },
+        },
+      }],
+      'parentId': '1c67d3ba-2a02-4908-a994-ad9634b558a5',
+      'hasChildren': false,
+      'namespace': 'default',
+      'created': 1594405143,
+    },
+    'web2-644ffbbb4 pods': {
+      'name': 'web2-644ffbbb4 pods',
+      'apiVersion': 'v1',
+      'kind': 'Pod',
+      'status': 'warning',
+      'details': [{
+        'metadata': { 'type': 'podStatus' },
+        'config': {
+          'pods': {
+            'web2-644ffbbb4-w4fkv': {
+              'details': [{
+                'metadata': { 'type': 'text' },
+                'config': { 'value': '' },
+              }], 'status': 'warning',
+            },
+          },
+        },
+      }],
+      'parentId': '42880eec-d627-4cd2-aede-71124375bd28',
+      'hasChildren': false,
+      'namespace': 'default',
+      'created': 1594405659,
+    },
+  },
+};
+

@@ -7,11 +7,14 @@ import {
   DaemonSet,
   Deployment,
   Event,
+  Ingress,
   Job,
   Namespace,
   Node,
   Pod,
   ReplicaSet,
+  Role,
+  RoleBinding,
   Secret,
   Service,
   ServiceAccount,
@@ -71,6 +74,13 @@ export abstract class ShapeUtils {
     switch (data.kind) {
       case 'Service':
         return new Service(
+          id,
+          ShapeUtils.getLabel(data),
+          data.hasChildren,
+          data.parentId
+        );
+      case 'Ingress':
+        return new Ingress(
           id,
           ShapeUtils.getLabel(data),
           data.hasChildren,
@@ -148,6 +158,20 @@ export abstract class ShapeUtils {
         );
       case 'Event':
         return new Event(
+          id,
+          ShapeUtils.getLabel(data),
+          data.hasChildren,
+          data.parentId
+        );
+      case 'Role':
+        return new Role(
+          id,
+          ShapeUtils.getLabel(data),
+          data.hasChildren,
+          data.parentId
+        );
+      case 'RoleBinding':
+        return new RoleBinding(
           id,
           ShapeUtils.getLabel(data),
           data.hasChildren,

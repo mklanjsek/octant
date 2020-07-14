@@ -103,14 +103,7 @@ export class Cytoscape2Component implements OnChanges {
         if (this.cytoscape.nodes().length > 1) {
           this.cytoscape.fit();
         } else {
-          const node = this.cytoscape.nodes()[0];
-          this.cytoscape.zoom({
-            level: 0.4,
-            position: {
-              x: node.data('x') - node.width() / 2,
-              y: node.data('y') - node.height(),
-            },
-          });
+          this.cytoscape.fit(undefined, 150);
         }
       }
     });
