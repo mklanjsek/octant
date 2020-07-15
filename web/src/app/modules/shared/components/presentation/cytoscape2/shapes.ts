@@ -69,27 +69,29 @@ export abstract class Shape extends BaseShape {
     }
 
     const isFirst = sameKind.length > 1 && sameKind[0].id === this.id;
+    const sameIndex = sameKind.findIndex(shape => shape.id === this.id);
 
     return sameKind.length > 1 && !isFirst
-      ? this.getOverflowPosition(shapes, preferred)
+      ? this.getOverflowPosition(shapes, preferred, sameIndex)
       : preferred;
   }
 
   getOverflowPosition(
     shapes: Shape[],
-    preferred: { x: number; y: number }
+    preferred: { x: number; y: number },
+    index: number
   ): { x: number; y: number } {
     switch (this.overflowDirection) {
       default:
       case OverflowDirectionType.DOWN:
         return {
           x: preferred.x,
-          y: preferred.y + (4 * this.getHeight(shapes)) / 3,
+          y: preferred.y + (4 * index * this.getHeight(shapes)) / 3,
         };
       case OverflowDirectionType.RIGHT:
         return {
-          x: preferred.x + (5 * this.getWidth(shapes)) / 4,
-          y: preferred.y + this.getHeight(shapes) / 2,
+          x: preferred.x + (5 * index * this.getWidth(shapes)) / 4,
+          y: preferred.y + (index * this.getHeight(shapes)) / 2,
         };
     }
   }
@@ -269,12 +271,29 @@ export class Job extends Shape {
     hasChildren: boolean,
     parentId?: string
   ) {
+    super(id, 'Job', label, 550, 400, 'roundrectangle', hasChildren, parentId);
+    this.classes = 'deployment';
+    this.overflowDirection = OverflowDirectionType.RIGHT;
+  }
+
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+    return { x: 825, y: 475 };
+  }
+}
+
+export class CronJob extends Shape {
+  constructor(
+    id: string,
+    label: string,
+    hasChildren: boolean,
+    parentId?: string
+  ) {
     super(
       id,
-      'DaemonSet',
+      'CronJob',
       label,
-      550,
-      400,
+      350,
+      200,
       'roundrectangle',
       hasChildren,
       parentId
@@ -283,7 +302,7 @@ export class Job extends Shape {
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
-    return { x: 825, y: 475 };
+    return { x: 0, y: 200 };
   }
 }
 

@@ -17,6 +17,8 @@
             [elements]="graphData2"
             [layout]="layout2"
             [zoom]="zoom"
+            (select)="nodeChange($event)"
+            (doubleClick)="openNode($event)"
           >
           </app-cytoscape2>
         </div>

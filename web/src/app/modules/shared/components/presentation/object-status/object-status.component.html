@@ -20,4 +20,27 @@
       </div>
     </div>
   </div>
+
+  <div class="properties">
+    <table class="table table-vertical">
+      <tbody>
+        <tr>
+          <th>Version</th>
+          <td>{{node.apiVersion}}</td>
+        </tr>
+        <tr>
+          <th>Kind</th>
+          <td>{{node.kind}}</td>
+        </tr>
+        <tr>
+          <th>Namespace</th>
+          <td>{{node.namespace}}</td>
+        </tr>
+        <tr>
+          <th>Created</th>
+          <td>{{node.created * 1000 | date}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

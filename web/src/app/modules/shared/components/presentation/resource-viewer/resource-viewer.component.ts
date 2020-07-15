@@ -18,6 +18,7 @@ import {
 } from 'src/app/modules/shared/models/content';
 import { ElementsDefinition, Stylesheet } from 'cytoscape';
 import { ShapeUtils } from '../cytoscape2/shape.utils';
+import { Router } from '@angular/router';
 
 const statusColorCodes = {
   ok: '#60b515',
@@ -118,7 +119,7 @@ export class ResourceViewerComponent implements OnChanges, AfterViewInit {
 
   private afterFirstChange: boolean;
 
-  constructor() {}
+  constructor(private router: Router) {}
 
   ngAfterViewInit(): void {
     if (this.afterFirstChange) {
@@ -144,6 +145,13 @@ export class ResourceViewerComponent implements OnChanges, AfterViewInit {
 
   nodeChange(event) {
     this.select(event.id);
+  }
+
+  openNode(event) {
+    const node = this.currentView.config.nodes[event.id];
+    if (node && node.path) {
+      this.router.navigateByUrl(node.path.config.ref);
+    }
   }
 
   generateGraphData2(): ElementsDefinition {

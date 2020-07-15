@@ -48,11 +48,14 @@ export class Cytoscape2Component implements OnChanges {
   @Input() public layout: any;
   @Input() public zoom: any;
   @Output() select: EventEmitter<any> = new EventEmitter<any>();
+  @Output() doubleClick: EventEmitter<any> = new EventEmitter<any>();
 
   cytoscape: cytoscape.Core;
   style: Stylesheet[] = ELEMENTS_STYLE;
   applied = false;
   moveStarted = false;
+  doubleClickDelay = 400;
+  previousTapStamp;
 
   constructor(private renderer: Renderer2, private el: ElementRef) {
     this.layout = this.layout || {
@@ -79,6 +82,7 @@ export class Cytoscape2Component implements OnChanges {
   public render() {
     const cyContainer = this.renderer.selectRootElement(this.cy.nativeElement);
     const localSelect = this.select;
+    const localDoubleClick = this.doubleClick;
     const options: cytoscape.CytoscapeOptions = {
       container: cyContainer,
       layout: this.layout,
@@ -90,8 +94,16 @@ export class Cytoscape2Component implements OnChanges {
     this.cytoscape = cytoscape(options);
 
     this.cytoscape.on('tap', 'node', e => {
+      const currentTapStamp = e.timeStamp;
+      const msFromLastTap = currentTapStamp - this.previousTapStamp;
       const node: SingularData = e.target;
-      localSelect.emit(node.data());
+
+      if (msFromLastTap < this.doubleClickDelay) {
+        localDoubleClick.emit(node.data());
+      } else {
+        localSelect.emit(node.data());
+      }
+      this.previousTapStamp = currentTapStamp;
     });
 
     this.cytoscape.on('layoutstop', e => {

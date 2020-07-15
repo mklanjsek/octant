@@ -4,6 +4,7 @@ import {
   ClusterRoleBinding,
   ConfigMap,
   CRD,
+  CronJob,
   DaemonSet,
   Deployment,
   Event,
@@ -200,6 +201,13 @@ export abstract class ShapeUtils {
         );
       case 'Job':
         return new Job(
+          id,
+          ShapeUtils.getLabel(data),
+          data.hasChildren,
+          data.parentId
+        );
+      case 'CronJob':
+        return new CronJob(
           id,
           ShapeUtils.getLabel(data),
           data.hasChildren,
