@@ -10,6 +10,7 @@ enum OverflowDirectionType {
 export abstract class Shape extends BaseShape {
   protected constructor(
     id: string,
+    public status: string,
     kind: string,
     public label: string,
     public preferedWidth: any,
@@ -56,7 +57,7 @@ export abstract class Shape extends BaseShape {
   }
 
   preferredPortPosition(shapes: Shape[]): number {
-    return this.preferredPosition(shapes).y - this.getHeight(shapes) / 6;
+    return this.preferredPosition(shapes).y - this.getHeight(shapes) / 10;
   }
 
   getPosition(shapes: Shape[]): { x: number; y: number } {
@@ -123,6 +124,10 @@ export abstract class Shape extends BaseShape {
     return this.parentId === undefined;
   }
 
+  isSelectable(): boolean {
+    return true;
+  }
+
   getTextWidth(txt) {
     const fontName = 'Metropolis';
     const fontSize = 14;
@@ -147,19 +152,19 @@ export abstract class Shape extends BaseShape {
     return {
       data: {
         id: this.id,
-        label: this.label,
+        label: this.constructor.name === 'Port' ? this.label : '',
         owner: this.parentId,
         width: this.getWidth(shapes),
         height: this.getHeight(shapes),
+        status: this.status,
         x,
         y,
         hasChildren: this.hasChildren,
-        shape: this.shape,
       },
       group: 'nodes',
       removed: false,
       selected: false,
-      selectable: this.isMovable(),
+      selectable: this.isSelectable(),
       locked: false,
       grabbable: this.isMovable(),
       pannable: false,
@@ -168,31 +173,30 @@ export abstract class Shape extends BaseShape {
   }
 
   protected getParent(shapes: Shape[]) {
-    const parentNode: Shape = shapes.find(
-      (shape: Shape) => shape.id === this.parentId
-    );
-    return parentNode;
+    return shapes.find((shape: Shape) => shape.id === this.parentId);
   }
 }
 
 export class Deployment extends Shape {
   constructor(
     id: string,
+    status: string,
     label: string,
     hasChildren: boolean,
     parentId?: string
   ) {
     super(
       id,
+      status,
       'Deployment',
       label,
       700,
       500,
-      'rectangle',
+      'polygon',
       hasChildren,
       parentId
     );
-    this.classes = 'deployment';
+    this.classes = 'deployment status';
     this.overflowDirection = OverflowDirectionType.RIGHT;
   }
 
@@ -215,10 +219,9 @@ export class Deployment extends Shape {
   }
 
   private totalReplicas(shapes: Shape[]): number {
-    const totalChildren = shapes.filter(
+    return shapes.filter(
       shape => shape.parentId === this.id && shape.kind === 'ReplicaSet'
     ).length;
-    return totalChildren;
   }
 
   getChildPosition(shapes: Shape[], target: Shape): { x: number; y: number } {
@@ -242,12 +245,14 @@ export class Deployment extends Shape {
 export class DaemonSet extends Shape {
   constructor(
     id: string,
+    status: string,
     label: string,
     hasChildren: boolean,
     parentId?: string
   ) {
     super(
       id,
+      status,
       'DaemonSet',
       label,
       550,
@@ -256,7 +261,7 @@ export class DaemonSet extends Shape {
       hasChildren,
       parentId
     );
-    this.classes = 'deployment';
+    this.classes = 'sets status';
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
@@ -267,12 +272,23 @@ export class DaemonSet extends Shape {
 export class Job extends Shape {
   constructor(
     id: string,
+    status: string,
     label: string,
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(id, 'Job', label, 550, 400, 'roundrectangle', hasChildren, parentId);
-    this.classes = 'deployment';
+    super(
+      id,
+      status,
+      'Job',
+      label,
+      550,
+      400,
+      'roundrectangle',
+      hasChildren,
+      parentId
+    );
+    this.classes = 'sets status';
     this.overflowDirection = OverflowDirectionType.RIGHT;
   }
 
@@ -284,12 +300,14 @@ export class Job extends Shape {
 export class CronJob extends Shape {
   constructor(
     id: string,
+    status: string,
     label: string,
     hasChildren: boolean,
     parentId?: string
   ) {
     super(
       id,
+      status,
       'CronJob',
       label,
       350,
@@ -298,7 +316,7 @@ export class CronJob extends Shape {
       hasChildren,
       parentId
     );
-    this.classes = 'deployment';
+    this.classes = 'secret status';
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
@@ -309,12 +327,14 @@ export class CronJob extends Shape {
 export class StatefulSet extends Shape {
   constructor(
     id: string,
+    status: string,
     label: string,
     hasChildren: boolean,
     parentId?: string
   ) {
     super(
       id,
+      status,
       'StatefulSet',
       label,
       550,
@@ -323,7 +343,7 @@ export class StatefulSet extends Shape {
       hasChildren,
       parentId
     );
-    this.classes = 'deployment';
+    this.classes = 'sets status';
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
@@ -334,12 +354,14 @@ export class StatefulSet extends Shape {
 export class Secret extends Shape {
   constructor(
     id: string,
+    status: string,
     label: string,
     hasChildren: boolean,
     parentId?: string
   ) {
     super(
       id,
+      status,
       'Secret',
       label,
       350,
@@ -348,7 +370,7 @@ export class Secret extends Shape {
       hasChildren,
       parentId
     );
-    this.classes = 'secret';
+    this.classes = 'secret status';
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
@@ -359,12 +381,14 @@ export class Secret extends Shape {
 export class ServiceAccount extends Shape {
   constructor(
     id: string,
+    status: string,
     label: string,
     hasChildren: boolean,
     parentId?: string
   ) {
     super(
       id,
+      status,
       'ServiceAccount',
       label,
       350,
@@ -373,7 +397,7 @@ export class ServiceAccount extends Shape {
       hasChildren,
       parentId
     );
-    this.classes = 'secret';
+    this.classes = 'secret status';
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
@@ -384,12 +408,14 @@ export class ServiceAccount extends Shape {
 export class Service extends Shape {
   constructor(
     id: string,
+    status: string,
     label: string,
     hasChildren: boolean,
     parentId?: string
   ) {
     super(
       id,
+      status,
       'Service',
       label,
       350,
@@ -398,7 +424,7 @@ export class Service extends Shape {
       hasChildren,
       parentId
     );
-    this.classes = 'secret';
+    this.classes = 'secret status';
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
@@ -409,12 +435,14 @@ export class Service extends Shape {
 export class Ingress extends Shape {
   constructor(
     id: string,
+    status: string,
     label: string,
     hasChildren: boolean,
     parentId?: string
   ) {
     super(
       id,
+      status,
       'Ingress',
       label,
       350,
@@ -423,7 +451,7 @@ export class Ingress extends Shape {
       hasChildren,
       parentId
     );
-    this.classes = 'secret';
+    this.classes = 'secret status';
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
@@ -434,12 +462,23 @@ export class Ingress extends Shape {
 export class ConfigMap extends Shape {
   constructor(
     id: string,
+    status: string,
     label: string,
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(id, 'ConfigMap', label, 350, 200, 'rectangle', hasChildren, parentId);
-    this.classes = 'secret';
+    super(
+      id,
+      status,
+      'ConfigMap',
+      label,
+      350,
+      200,
+      'rectangle',
+      hasChildren,
+      parentId
+    );
+    this.classes = 'secret status';
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
@@ -450,12 +489,23 @@ export class ConfigMap extends Shape {
 export class Node extends Shape {
   constructor(
     id: string,
+    status: string,
     label: string,
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(id, 'Node', label, 350, 200, 'rectangle', hasChildren, parentId);
-    this.classes = 'secret';
+    super(
+      id,
+      status,
+      'Node',
+      label,
+      350,
+      200,
+      'rectangle',
+      hasChildren,
+      parentId
+    );
+    this.classes = 'secret status';
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
@@ -466,12 +516,23 @@ export class Node extends Shape {
 export class Namespace extends Shape {
   constructor(
     id: string,
+    status: string,
     label: string,
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(id, 'Namespace', label, 350, 200, 'rectangle', hasChildren, parentId);
-    this.classes = 'secret';
+    super(
+      id,
+      status,
+      'Namespace',
+      label,
+      350,
+      200,
+      'rectangle',
+      hasChildren,
+      parentId
+    );
+    this.classes = 'secret status';
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
@@ -482,11 +543,22 @@ export class Namespace extends Shape {
 export class Event extends Shape {
   constructor(
     id: string,
+    status: string,
     label: string,
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(id, 'Event', label, 350, 200, 'rectangle', hasChildren, parentId);
+    super(
+      id,
+      status,
+      'Event',
+      label,
+      350,
+      200,
+      'rectangle',
+      hasChildren,
+      parentId
+    );
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
@@ -497,12 +569,14 @@ export class Event extends Shape {
 export class ClusterRole extends Shape {
   constructor(
     id: string,
+    status: string,
     label: string,
     hasChildren: boolean,
     parentId?: string
   ) {
     super(
       id,
+      status,
       'ClusterRole',
       label,
       350,
@@ -521,12 +595,14 @@ export class ClusterRole extends Shape {
 export class ClusterRoleBinding extends Shape {
   constructor(
     id: string,
+    status: string,
     label: string,
     hasChildren: boolean,
     parentId?: string
   ) {
     super(
       id,
+      status,
       'ClusterRoleBinding',
       label,
       350,
@@ -545,11 +621,22 @@ export class ClusterRoleBinding extends Shape {
 export class Role extends Shape {
   constructor(
     id: string,
+    status: string,
     label: string,
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(id, 'Role', label, 350, 200, 'rectangle', hasChildren, parentId);
+    super(
+      id,
+      status,
+      'Role',
+      label,
+      350,
+      200,
+      'rectangle',
+      hasChildren,
+      parentId
+    );
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
@@ -560,12 +647,14 @@ export class Role extends Shape {
 export class RoleBinding extends Shape {
   constructor(
     id: string,
+    status: string,
     label: string,
     hasChildren: boolean,
     parentId?: string
   ) {
     super(
       id,
+      status,
       'RoleBinding',
       label,
       350,
@@ -584,12 +673,14 @@ export class RoleBinding extends Shape {
 export class CRD extends Shape {
   constructor(
     id: string,
+    status: string,
     label: string,
     hasChildren: boolean,
     parentId?: string
   ) {
     super(
       id,
+      status,
       'CustomResourceDefinition',
       label,
       350,
@@ -608,12 +699,14 @@ export class CRD extends Shape {
 export class Unknown extends Shape {
   constructor(
     id: string,
+    status: string,
     label: string,
     hasChildren: boolean,
     parentId?: string
   ) {
     super(
       id,
+      status,
       'Unknown',
       `Unknown resource: ${label}`,
       350,
@@ -633,12 +726,14 @@ export class Unknown extends Shape {
 export class ReplicaSet extends Shape {
   constructor(
     id: string,
+    status: string,
     label: string,
     hasChildren: boolean,
     parentId?: string
   ) {
     super(
       id,
+      status,
       'ReplicaSet',
       label,
       500,
@@ -647,7 +742,7 @@ export class ReplicaSet extends Shape {
       hasChildren,
       parentId
     );
-    this.classes = 'replicaset';
+    this.classes = 'replicaset status';
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
@@ -658,12 +753,23 @@ export class ReplicaSet extends Shape {
 export class Pod extends Shape {
   constructor(
     id: string,
+    status: string,
     label: string,
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(id, 'Pod', label, 350, 200, 'roundrectangle', hasChildren, parentId);
-    this.classes = 'pod';
+    super(
+      id,
+      status,
+      'Pod',
+      label,
+      350,
+      200,
+      'roundrectangle',
+      hasChildren,
+      parentId
+    );
+    this.classes = 'pod status';
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
@@ -674,16 +780,31 @@ export class Pod extends Shape {
 export class Port extends Shape {
   constructor(
     id: string,
+    status: string,
     label: string,
     public location: string,
     className: string,
     parentId?: string
   ) {
-    super(id, 'Port', label, 'label', 'label', 'rectangle', false, parentId);
+    super(
+      id,
+      status,
+      'Port',
+      label,
+      'label',
+      'label',
+      'rectangle',
+      false,
+      parentId
+    );
     this.classes = className;
   }
 
   isMovable(): boolean {
+    return false;
+  }
+
+  isSelectable(): boolean {
     return false;
   }
 

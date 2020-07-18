@@ -36,6 +36,7 @@ cytoscape('layout', 'octant', octant);
         height: 100%;
         width: 100%;
         position: relative;
+        background-color: #fafafa;
         left: 0;
         top: 0;
       }
@@ -110,10 +111,10 @@ export class Cytoscape2Component implements OnChanges {
       if (!this.applied) {
         this.applied = true;
         this.cytoscape
-          .nodes('[?hasChildren]')
+          .nodes()
           .forEach(node => positionChildren(this.cytoscape, node));
         if (this.cytoscape.nodes().length > 1) {
-          this.cytoscape.fit();
+          this.cytoscape.fit(undefined, 50);
         } else {
           this.cytoscape.fit(undefined, 150);
         }
@@ -134,4 +135,71 @@ export class Cytoscape2Component implements OnChanges {
       this.moveStarted = false;
     });
   }
+
+  // .popper-0 {
+  //   background: transparent;
+  //   font-family: Metropolis;
+  //   font-size: 16px;
+  //   color: #000000;
+  //   z-index: 9999;
+  //   padding: 0.25em;
+  //   pointer-events: none;
+  //   top: 22px !important;
+  // }
+  //
+  // .popper-1 {
+  //   background: transparent;
+  //   font-family: Metropolis;
+  //   font-size: 11px;
+  //   color: #737373;
+  //   z-index: 9999;
+  //   padding: 0.25em;
+  //   pointer-events: none;
+  //   top: 38px !important;
+  // }
+
+  //
+  // deletePoppers() {
+  //   this.poppers.forEach((popper, index) => {
+  //     if(popper && popper.nodeType) {
+  //       document.body.removeChild(popper);
+  //       this.poppers[index] = null;
+  //       popper = null;
+  //     }
+  //   });
+  //
+  // }
+  //
+  // addPopper(node: any){
+  //   if(node.isNode() && !node.data('popperCreated')) {
+  //     const labels = node.data('label').split('\n');
+  //     labels.forEach((label,index) => {
+  //
+  //       const popper = node.popper({
+  //         content: () => {
+  //           const div = document.createElement('div');
+  //           const classes= `popper-${index}`;
+  //
+  //           div.classList.add(classes);
+  //           div.innerHTML = label;
+  //           document.body.appendChild(div);
+  //           this.poppers.push(div);
+  //           return div;
+  //         },
+  //         popper: { placement: 'top-start', removeOnDestroy: true, positionFixed:true }
+  //       });
+  //
+  //       const update = () => {
+  //         const zoom = this.cytoscape.zoom();
+  //         popper.popper.style.fontSize = 24 * zoom + 'px';
+  //         popper.scheduleUpdate();
+  //       };
+  //
+  //       node.on('position', update);
+  //       this.cytoscape.on('pan zoom resize', update);
+  //       node.data('popperCreated', true)
+  //     });
+  //     node.data('label', '');
+  //   }
+  // }
 }

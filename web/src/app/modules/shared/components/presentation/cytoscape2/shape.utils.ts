@@ -19,6 +19,7 @@ import {
   Secret,
   Service,
   ServiceAccount,
+  Shape,
   StatefulSet,
   Unknown,
 } from './shapes';
@@ -46,7 +47,43 @@ export abstract class ShapeUtils {
         ShapeUtils.shapeOrder(a.kind) - ShapeUtils.shapeOrder(b.kind)
     );
 
-    return newShapes.map(shape => shape && shape.toNode(newShapes));
+    const nodes = newShapes.map(shape => shape && shape.toNode(newShapes));
+    return ShapeUtils.addHeaderNodes(newShapes, nodes);
+  }
+
+  static addHeaderNodes(shapes: BaseShape[], nodes: any) {
+    shapes.forEach((shape: Shape) => {
+      if (shape.label && shape.constructor.name !== 'Port') {
+        const labels = shape.label.split('\n');
+
+        labels.forEach((label, index) => {
+          const { x, y } = shape.getPosition(shapes as Shape[]);
+          const headerNode = {
+            data: {
+              id: `${shape.id}-header-${index}`,
+              label,
+              owner: shape.id,
+              width: 300,
+              height: 24,
+              x: x - shape.getWidth(shapes as Shape[]) / 2 + 150 - 6,
+              y: y - shape.getHeight(shapes as Shape[]) / 2 + 8 + index * 24,
+              hasChildren: false,
+            },
+            group: 'nodes',
+            removed: false,
+            selected: false,
+            selectable: false,
+            locked: false,
+            grabbable: false,
+            pannable: false,
+            classes: `header header-${index + 1}`,
+          };
+          nodes.push(headerNode);
+        });
+        shape.label = '';
+      }
+    });
+    return nodes;
   }
 
   static createEdges(shapes: BaseShape[], edges: BackendEdgesDef) {
@@ -76,6 +113,7 @@ export abstract class ShapeUtils {
       case 'Service':
         return new Service(
           id,
+          data.status,
           ShapeUtils.getLabel(data),
           data.hasChildren,
           data.parentId
@@ -83,6 +121,7 @@ export abstract class ShapeUtils {
       case 'Ingress':
         return new Ingress(
           id,
+          data.status,
           ShapeUtils.getLabel(data),
           data.hasChildren,
           data.parentId
@@ -90,6 +129,7 @@ export abstract class ShapeUtils {
       case 'ReplicaSet':
         return new ReplicaSet(
           id,
+          data.status,
           ShapeUtils.getLabel(data),
           data.hasChildren,
           data.parentId
@@ -97,6 +137,7 @@ export abstract class ShapeUtils {
       case 'ServiceAccount':
         return new ServiceAccount(
           id,
+          data.status,
           ShapeUtils.getLabel(data),
           data.hasChildren,
           data.parentId
@@ -104,6 +145,7 @@ export abstract class ShapeUtils {
       case 'Secret':
         return new Secret(
           id,
+          data.status,
           ShapeUtils.getLabel(data),
           data.hasChildren,
           data.parentId
@@ -111,6 +153,7 @@ export abstract class ShapeUtils {
       case 'Pod':
         return new Pod(
           id,
+          data.status,
           ShapeUtils.getLabel(data),
           data.hasChildren,
           data.parentId
@@ -118,6 +161,7 @@ export abstract class ShapeUtils {
       case 'Deployment':
         return new Deployment(
           id,
+          data.status,
           ShapeUtils.getLabel(data),
           data.hasChildren,
           data.parentId
@@ -125,6 +169,7 @@ export abstract class ShapeUtils {
       case 'ConfigMap':
         return new ConfigMap(
           id,
+          data.status,
           ShapeUtils.getLabel(data),
           data.hasChildren,
           data.parentId
@@ -132,6 +177,7 @@ export abstract class ShapeUtils {
       case 'DaemonSet':
         return new DaemonSet(
           id,
+          data.status,
           ShapeUtils.getLabel(data),
           data.hasChildren,
           data.parentId
@@ -139,6 +185,7 @@ export abstract class ShapeUtils {
       case 'StatefulSet':
         return new StatefulSet(
           id,
+          data.status,
           ShapeUtils.getLabel(data),
           data.hasChildren,
           data.parentId
@@ -146,6 +193,7 @@ export abstract class ShapeUtils {
       case 'Node':
         return new Node(
           id,
+          data.status,
           ShapeUtils.getLabel(data),
           data.hasChildren,
           data.parentId
@@ -153,6 +201,7 @@ export abstract class ShapeUtils {
       case 'Namespace':
         return new Namespace(
           id,
+          data.status,
           ShapeUtils.getLabel(data),
           data.hasChildren,
           data.parentId
@@ -160,6 +209,7 @@ export abstract class ShapeUtils {
       case 'Event':
         return new Event(
           id,
+          data.status,
           ShapeUtils.getLabel(data),
           data.hasChildren,
           data.parentId
@@ -167,6 +217,7 @@ export abstract class ShapeUtils {
       case 'Role':
         return new Role(
           id,
+          data.status,
           ShapeUtils.getLabel(data),
           data.hasChildren,
           data.parentId
@@ -174,6 +225,7 @@ export abstract class ShapeUtils {
       case 'RoleBinding':
         return new RoleBinding(
           id,
+          data.status,
           ShapeUtils.getLabel(data),
           data.hasChildren,
           data.parentId
@@ -181,6 +233,7 @@ export abstract class ShapeUtils {
       case 'ClusterRole':
         return new ClusterRole(
           id,
+          data.status,
           ShapeUtils.getLabel(data),
           data.hasChildren,
           data.parentId
@@ -188,6 +241,7 @@ export abstract class ShapeUtils {
       case 'ClusterRoleBinding':
         return new ClusterRoleBinding(
           id,
+          data.status,
           ShapeUtils.getLabel(data),
           data.hasChildren,
           data.parentId
@@ -195,6 +249,7 @@ export abstract class ShapeUtils {
       case 'CustomResourceDefinition':
         return new CRD(
           id,
+          data.status,
           ShapeUtils.getLabel(data),
           data.hasChildren,
           data.parentId
@@ -202,6 +257,7 @@ export abstract class ShapeUtils {
       case 'Job':
         return new Job(
           id,
+          data.status,
           ShapeUtils.getLabel(data),
           data.hasChildren,
           data.parentId
@@ -209,12 +265,19 @@ export abstract class ShapeUtils {
       case 'CronJob':
         return new CronJob(
           id,
+          data.status,
           ShapeUtils.getLabel(data),
           data.hasChildren,
           data.parentId
         );
       default:
-        return new Unknown(id, data.kind, data.hasChildren, data.parentId);
+        return new Unknown(
+          id,
+          data.status,
+          data.kind,
+          data.hasChildren,
+          data.parentId
+        );
     }
   }
 

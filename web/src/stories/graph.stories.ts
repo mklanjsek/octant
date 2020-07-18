@@ -27,25 +27,26 @@ const zoom = {
 
 storiesOf('Resources', module).add('with ports', () => {
   const oldShapesWithPorts: BaseShape[] = [
-    new Deployment('glyph0', 'Deployment', true),
-    new Secret('glyph2', 'Secret', true),
-    new ServiceAccount('glyph3', 'ServiceAccount', false),
-    new Service('glyph1', 'Service', true),
-    new ReplicaSet('glyph10', 'ReplicaSet: 3', true, 'glyph0'),
-    new Pod('glyph30', 'Pods', true, 'glyph10'),
-    new Port('glyph20', 'image: nginx', 'left', 'port', 'glyph0'),
-    new Port('glyph21', 'metadata.annotations', 'right', 'port', 'glyph2'),
-    new Port('glyph41', 'app: demo', 'left', 'label', 'glyph30'),
-    new Port('glyph42', 'app: demo', 'right', 'selector', 'glyph1'),
-    new Port('glyph50', 'name', 'right', 'port', 'glyph3'),
-    new Port('glyph51', 'serviceAccount', 'left', 'port', 'glyph30'),
-    new Port('glyph52', 'secrets.name', 'left', 'port', 'glyph3'),
+    new Deployment('glyph0', 'ok', 'Deployment', true),
+    new Secret('glyph2', 'ok', 'Secret', true),
+    new ServiceAccount('glyph3', 'warning', 'ServiceAccount', false),
+    new Service('glyph1', 'error', 'Service', true),
+    new ReplicaSet('glyph10', 'ok', 'ReplicaSet: 3', true, 'glyph0'),
+    new Pod('glyph30', 'ok', 'Pods', true, 'glyph10'),
+    new Port('glyph20', 'ok', 'image: nginx', 'left', 'port', 'glyph0'),
+    new Port('glyph21', 'ok', 'metadata.annotations', 'right', 'port', 'glyph2'),
+    new Port('glyph41', 'ok', 'app: demo', 'left', 'label', 'glyph30'),
+    new Port('glyph42', 'ok', 'app: demo', 'right', 'selector', 'glyph1'),
+    new Port('glyph50', 'ok', 'name', 'right', 'port', 'glyph3'),
+    new Port('glyph51', 'ok', 'serviceAccount', 'left', 'port', 'glyph30'),
+    new Port('glyph52', 'ok', 'secrets.name', 'left', 'port', 'glyph3'),
     new Edge('glyph42-glyph41', 'glyph42', 'glyph41'),
     new Edge('glyph52-glyph21', 'glyph52', 'glyph21'),
     new Edge('glyph50-glyph51', 'glyph50', 'glyph51', 'unbundled'),
   ];
 
-  const eles = object('elements', oldShapesWithPorts.map(shape => shape.toNode(oldShapesWithPorts)));
+  const nodes=  oldShapesWithPorts.map(shape => shape.toNode(oldShapesWithPorts));
+  const eles = object('elements', ShapeUtils.addHeaderNodes(oldShapesWithPorts, nodes));
 
   return {
     props: {
