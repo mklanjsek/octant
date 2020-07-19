@@ -4,6 +4,7 @@
 
 :host-context(body) {
   --selection-color: var(--clr-color-neutral-400);
+  --selection-color-hover: #0072a3;
   --flyout-background-color: var(--clr-color-neutral-50);
   --flyout-color: var(--clr-global-font-color);
   --flyout-header-color: var(--clr-vertical-nav-item-color, #666666);
@@ -12,6 +13,7 @@
 
 :host-context(body.dark) {
   --selection-color: #324f62;
+  --selection-color-hover: #fff;
   --flyout-background-color: #1b2a32;
   --flyout-color: #acbac3;
   --flyout-header-color: #acbac3;
@@ -75,6 +77,10 @@
     background-color: var(--selection-color);
   }
 
+  .item-selected:hover {
+    color: var(--selection-color-hover);
+  }
+
   .navigation-items {
     flex-grow: 1;
     overflow-y: auto;
@@ -117,7 +123,7 @@
   }
 
   .flyout {
-    display: flex;
+    display: none;
     border-color: var(--navigation-border-color);
     border-style: solid;
     border-width: 0px 1px 1px 1px;
@@ -138,6 +144,17 @@
     .flyout-header {
       border-radius: 0px 3px 3px 0px;
     }
+  }
+
+  .nav-link.active {
+    background-color: var(--selection-color);
+  }
+  .item-selected:hover + .flyout {
+    display: flex;
+  }
+
+  .flyout:hover {
+    display: flex;
   }
 
 }

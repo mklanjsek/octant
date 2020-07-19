@@ -14,6 +14,8 @@ import (
 	"github.com/vmware-tanzu/octant/pkg/plugin/dashboard"
 )
 
+//go:generate rice embed-go
+
 var (
 	pluginMap = map[string]plugin.Plugin{
 		Name: &ServicePlugin{},

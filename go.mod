@@ -9,10 +9,14 @@ require (
 	github.com/asticode/go-astilectron v0.14.2
 	github.com/asticode/go-astilectron-bundler v0.5.2
 	github.com/davecgh/go-spew v1.1.1
+	github.com/dlclark/regexp2 v1.2.0 // indirect
 	github.com/docker/spdystream v0.0.0-20181023171402-6480d4af844c // indirect
+	github.com/dop251/goja v0.0.0-20200629185240-bfd59704b500
+	github.com/dop251/goja_nodejs v0.0.0-20200706082813-b2775b86b9e0
 	github.com/elazarl/goproxy v0.0.0-20190703090003-6125c262ffb0 // indirect
 	github.com/elazarl/goproxy/ext v0.0.0-20190703090003-6125c262ffb0 // indirect
 	github.com/fsnotify/fsnotify v1.4.9
+	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/gobwas/glob v0.2.3
 	github.com/golang/mock v1.4.3
 	github.com/golang/protobuf v1.4.2
@@ -30,14 +34,17 @@ require (
 	github.com/nkovacs/streamquote v1.0.0 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/skratchdot/open-golang v0.0.0-20190402232053-79abb63cd66e
+	github.com/soheilhy/cmux v0.1.4
 	github.com/spf13/afero v1.3.2
 	github.com/spf13/cobra v0.0.7
 	github.com/spf13/viper v1.7.0
 	github.com/stretchr/testify v1.6.1
 	go.opencensus.io v0.22.4
 	go.uber.org/zap v1.15.0
-	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
+	golang.org/x/sync v0.0.0-20200625203802-6e8e738ad208
+	golang.org/x/tools v0.0.0-20200716134326-a8f9df4c9543 // indirect
 	google.golang.org/grpc v1.30.0
+	google.golang.org/grpc/examples v0.0.0-20200707005602-4258d12073b4 // indirect
 	k8s.io/api v0.19.0-alpha.3
 	k8s.io/apiextensions-apiserver v0.19.0-alpha.3
 	k8s.io/apimachinery v0.19.0-beta.2
