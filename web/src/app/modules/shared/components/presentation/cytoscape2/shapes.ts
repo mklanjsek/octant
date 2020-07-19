@@ -3,6 +3,7 @@ import { BaseShape } from './base.shape';
 enum OverflowDirectionType {
   DOWN,
   RIGHT,
+  DOWN_RIGHT,
   LEFT,
   UP,
 }
@@ -15,7 +16,6 @@ export abstract class Shape extends BaseShape {
     public label: string,
     public preferedWidth: any,
     public preferedHeight: any,
-    public shape: string,
     public hasChildren: boolean,
     public parentId?: string
   ) {
@@ -90,6 +90,11 @@ export abstract class Shape extends BaseShape {
           y: preferred.y + (4 * index * this.getHeight(shapes)) / 3,
         };
       case OverflowDirectionType.RIGHT:
+        return {
+          x: preferred.x + (5 * index * this.getWidth(shapes)) / 4,
+          y: preferred.y,
+        };
+      case OverflowDirectionType.DOWN_RIGHT:
         return {
           x: preferred.x + (5 * index * this.getWidth(shapes)) / 4,
           y: preferred.y + (index * this.getHeight(shapes)) / 2,
@@ -185,19 +190,9 @@ export class Deployment extends Shape {
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(
-      id,
-      status,
-      'Deployment',
-      label,
-      700,
-      500,
-      'polygon',
-      hasChildren,
-      parentId
-    );
+    super(id, status, 'Deployment', label, 700, 500, hasChildren, parentId);
     this.classes = 'deployment status';
-    this.overflowDirection = OverflowDirectionType.RIGHT;
+    this.overflowDirection = OverflowDirectionType.DOWN_RIGHT;
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
@@ -250,17 +245,7 @@ export class DaemonSet extends Shape {
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(
-      id,
-      status,
-      'DaemonSet',
-      label,
-      550,
-      400,
-      'roundrectangle',
-      hasChildren,
-      parentId
-    );
+    super(id, status, 'DaemonSet', label, 550, 400, hasChildren, parentId);
     this.classes = 'sets status';
   }
 
@@ -277,17 +262,7 @@ export class Job extends Shape {
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(
-      id,
-      status,
-      'Job',
-      label,
-      550,
-      400,
-      'roundrectangle',
-      hasChildren,
-      parentId
-    );
+    super(id, status, 'Job', label, 550, 400, hasChildren, parentId);
     this.classes = 'sets status';
     this.overflowDirection = OverflowDirectionType.RIGHT;
   }
@@ -305,18 +280,9 @@ export class CronJob extends Shape {
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(
-      id,
-      status,
-      'CronJob',
-      label,
-      350,
-      200,
-      'roundrectangle',
-      hasChildren,
-      parentId
-    );
+    super(id, status, 'CronJob', label, 350, 200, hasChildren, parentId);
     this.classes = 'secret status';
+    this.overflowDirection = OverflowDirectionType.DOWN_RIGHT;
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
@@ -332,17 +298,7 @@ export class StatefulSet extends Shape {
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(
-      id,
-      status,
-      'StatefulSet',
-      label,
-      550,
-      400,
-      'roundrectangle',
-      hasChildren,
-      parentId
-    );
+    super(id, status, 'StatefulSet', label, 550, 400, hasChildren, parentId);
     this.classes = 'sets status';
   }
 
@@ -359,17 +315,7 @@ export class Secret extends Shape {
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(
-      id,
-      status,
-      'Secret',
-      label,
-      350,
-      200,
-      'roundrectangle',
-      hasChildren,
-      parentId
-    );
+    super(id, status, 'Secret', label, 350, 200, hasChildren, parentId);
     this.classes = 'secret status';
   }
 
@@ -386,17 +332,7 @@ export class ServiceAccount extends Shape {
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(
-      id,
-      status,
-      'ServiceAccount',
-      label,
-      350,
-      200,
-      'roundrectangle',
-      hasChildren,
-      parentId
-    );
+    super(id, status, 'ServiceAccount', label, 350, 200, hasChildren, parentId);
     this.classes = 'secret status';
   }
 
@@ -413,17 +349,7 @@ export class Service extends Shape {
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(
-      id,
-      status,
-      'Service',
-      label,
-      350,
-      200,
-      'roundrectangle',
-      hasChildren,
-      parentId
-    );
+    super(id, status, 'Service', label, 350, 200, hasChildren, parentId);
     this.classes = 'secret status';
   }
 
@@ -440,17 +366,7 @@ export class Ingress extends Shape {
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(
-      id,
-      status,
-      'Ingress',
-      label,
-      350,
-      200,
-      'roundrectangle',
-      hasChildren,
-      parentId
-    );
+    super(id, status, 'Ingress', label, 350, 200, hasChildren, parentId);
     this.classes = 'secret status';
   }
 
@@ -467,17 +383,7 @@ export class ConfigMap extends Shape {
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(
-      id,
-      status,
-      'ConfigMap',
-      label,
-      350,
-      200,
-      'rectangle',
-      hasChildren,
-      parentId
-    );
+    super(id, status, 'ConfigMap', label, 350, 200, hasChildren, parentId);
     this.classes = 'secret status';
   }
 
@@ -494,17 +400,7 @@ export class Node extends Shape {
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(
-      id,
-      status,
-      'Node',
-      label,
-      350,
-      200,
-      'rectangle',
-      hasChildren,
-      parentId
-    );
+    super(id, status, 'Node', label, 350, 200, hasChildren, parentId);
     this.classes = 'secret status';
   }
 
@@ -521,17 +417,7 @@ export class Namespace extends Shape {
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(
-      id,
-      status,
-      'Namespace',
-      label,
-      350,
-      200,
-      'rectangle',
-      hasChildren,
-      parentId
-    );
+    super(id, status, 'Namespace', label, 350, 200, hasChildren, parentId);
     this.classes = 'secret status';
   }
 
@@ -548,17 +434,7 @@ export class Event extends Shape {
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(
-      id,
-      status,
-      'Event',
-      label,
-      350,
-      200,
-      'rectangle',
-      hasChildren,
-      parentId
-    );
+    super(id, status, 'Event', label, 350, 200, hasChildren, parentId);
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
@@ -574,17 +450,7 @@ export class ClusterRole extends Shape {
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(
-      id,
-      status,
-      'ClusterRole',
-      label,
-      350,
-      200,
-      'rectangle',
-      hasChildren,
-      parentId
-    );
+    super(id, status, 'ClusterRole', label, 350, 200, hasChildren, parentId);
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
@@ -607,7 +473,6 @@ export class ClusterRoleBinding extends Shape {
       label,
       350,
       200,
-      'rectangle',
       hasChildren,
       parentId
     );
@@ -626,17 +491,7 @@ export class Role extends Shape {
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(
-      id,
-      status,
-      'Role',
-      label,
-      350,
-      200,
-      'rectangle',
-      hasChildren,
-      parentId
-    );
+    super(id, status, 'Role', label, 350, 200, hasChildren, parentId);
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
@@ -652,19 +507,135 @@ export class RoleBinding extends Shape {
     hasChildren: boolean,
     parentId?: string
   ) {
+    super(id, status, 'RoleBinding', label, 350, 200, hasChildren, parentId);
+  }
+
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+    return { x: 0, y: 0 };
+  }
+}
+
+export class PersistentVolume extends Shape {
+  constructor(
+    id: string,
+    status: string,
+    label: string,
+    hasChildren: boolean,
+    parentId?: string
+  ) {
     super(
       id,
       status,
-      'RoleBinding',
+      'PersistentVolume',
       label,
       350,
       200,
-      'rectangle',
       hasChildren,
       parentId
     );
   }
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+    return { x: 0, y: 0 };
+  }
+}
 
+export class PersistentVolumeClaim extends Shape {
+  constructor(
+    id: string,
+    status: string,
+    label: string,
+    hasChildren: boolean,
+    parentId?: string
+  ) {
+    super(
+      id,
+      status,
+      'PersistentVolumeClaim',
+      label,
+      350,
+      200,
+      hasChildren,
+      parentId
+    );
+  }
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+    return { x: 0, y: 0 };
+  }
+}
+
+export class HorizontalPodAutoscaler extends Shape {
+  constructor(
+    id: string,
+    status: string,
+    label: string,
+    hasChildren: boolean,
+    parentId?: string
+  ) {
+    super(
+      id,
+      status,
+      'HorizontalPodAutoscaler',
+      label,
+      350,
+      200,
+      hasChildren,
+      parentId
+    );
+  }
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+    return { x: 0, y: 0 };
+  }
+}
+
+export class NetworkPolicy extends Shape {
+  constructor(
+    id: string,
+    status: string,
+    label: string,
+    hasChildren: boolean,
+    parentId?: string
+  ) {
+    super(id, status, 'NetworkPolicy', label, 350, 200, hasChildren, parentId);
+  }
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+    return { x: 0, y: 0 };
+  }
+}
+
+export class PodMetrics extends Shape {
+  constructor(
+    id: string,
+    status: string,
+    label: string,
+    hasChildren: boolean,
+    parentId?: string
+  ) {
+    super(id, status, 'PodMetrics', label, 350, 200, hasChildren, parentId);
+  }
+  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+    return { x: 0, y: 0 };
+  }
+}
+
+export class ReplicationController extends Shape {
+  constructor(
+    id: string,
+    status: string,
+    label: string,
+    hasChildren: boolean,
+    parentId?: string
+  ) {
+    super(
+      id,
+      status,
+      'ReplicationController',
+      label,
+      350,
+      200,
+      hasChildren,
+      parentId
+    );
+  }
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
     return { x: 0, y: 0 };
   }
@@ -685,7 +656,6 @@ export class CRD extends Shape {
       label,
       350,
       200,
-      'rectangle',
       hasChildren,
       parentId
     );
@@ -711,11 +681,10 @@ export class Unknown extends Shape {
       `Unknown resource: ${label}`,
       350,
       200,
-      'rectangle',
       hasChildren,
       parentId
     );
-    this.classes = 'secret';
+    this.classes = 'unknown';
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
@@ -731,17 +700,7 @@ export class ReplicaSet extends Shape {
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(
-      id,
-      status,
-      'ReplicaSet',
-      label,
-      500,
-      350,
-      'rectangle',
-      hasChildren,
-      parentId
-    );
+    super(id, status, 'ReplicaSet', label, 500, 350, hasChildren, parentId);
     this.classes = 'replicaset status';
   }
 
@@ -758,17 +717,7 @@ export class Pod extends Shape {
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(
-      id,
-      status,
-      'Pod',
-      label,
-      350,
-      200,
-      'roundrectangle',
-      hasChildren,
-      parentId
-    );
+    super(id, status, 'Pod', label, 350, 200, hasChildren, parentId);
     this.classes = 'pod status';
   }
 
@@ -786,17 +735,7 @@ export class Port extends Shape {
     className: string,
     parentId?: string
   ) {
-    super(
-      id,
-      status,
-      'Port',
-      label,
-      'label',
-      'label',
-      'rectangle',
-      false,
-      parentId
-    );
+    super(id, status, 'Port', label, 'label', 'label', false, parentId);
     this.classes = className;
   }
 

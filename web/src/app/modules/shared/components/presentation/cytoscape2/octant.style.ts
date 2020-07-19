@@ -22,7 +22,7 @@ const renderImage = ele => {
     <rect x="0" y="0" width="36" height="36" fill-opacity="0"/></svg>`;
 
   const image =
-    status === 'ok' ? svgHealthy : status === 'error' ? svgWarning : svgError;
+    status === 'ok' ? svgHealthy : status === 'error' ? svgError : svgWarning;
   return 'data:image/svg+xml;base64,' + btoa(image);
 };
 
@@ -37,7 +37,7 @@ export const ELEMENTS_STYLE: Stylesheet[] = [
       content: 'data(label)',
       'background-color': 'white',
       color: 'black',
-      'border-color': '#C1CDD4',
+      'border-color': node => nodeColor(node),
       'border-width': '2px',
       'border-style': 'solid',
       ghost: 'no',
@@ -52,7 +52,6 @@ export const ELEMENTS_STYLE: Stylesheet[] = [
       'z-index': 1,
     },
   },
-
   {
     selector: 'node:selected',
     css: {
@@ -60,6 +59,7 @@ export const ELEMENTS_STYLE: Stylesheet[] = [
       'border-width': 2,
       'border-color': '#0079B8',
       'border-style': 'solid',
+      'overlay-opacity': 0,
     },
   },
   {
@@ -203,3 +203,14 @@ export const ELEMENTS_STYLE: Stylesheet[] = [
     },
   },
 ];
+
+function nodeColor(node): string {
+  switch (node.data('status')) {
+    case 'error':
+      return '#E62700';
+    case 'warning':
+      return '#EFC006';
+    default:
+      return '#C1CDD4';
+  }
+}

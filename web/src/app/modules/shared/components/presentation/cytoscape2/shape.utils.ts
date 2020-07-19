@@ -8,12 +8,18 @@ import {
   DaemonSet,
   Deployment,
   Event,
+  HorizontalPodAutoscaler,
   Ingress,
   Job,
   Namespace,
+  NetworkPolicy,
   Node,
+  PersistentVolume,
+  PersistentVolumeClaim,
   Pod,
+  PodMetrics,
   ReplicaSet,
+  ReplicationController,
   Role,
   RoleBinding,
   Secret,
@@ -224,6 +230,54 @@ export abstract class ShapeUtils {
         );
       case 'RoleBinding':
         return new RoleBinding(
+          id,
+          data.status,
+          ShapeUtils.getLabel(data),
+          data.hasChildren,
+          data.parentId
+        );
+      case 'PersistentVolume':
+        return new PersistentVolume(
+          id,
+          data.status,
+          ShapeUtils.getLabel(data),
+          data.hasChildren,
+          data.parentId
+        );
+      case 'PersistentVolumeClaim':
+        return new PersistentVolumeClaim(
+          id,
+          data.status,
+          ShapeUtils.getLabel(data),
+          data.hasChildren,
+          data.parentId
+        );
+      case 'HorizontalPodAutoscaler':
+        return new HorizontalPodAutoscaler(
+          id,
+          data.status,
+          ShapeUtils.getLabel(data),
+          data.hasChildren,
+          data.parentId
+        );
+      case 'NetworkPolicy':
+        return new NetworkPolicy(
+          id,
+          data.status,
+          ShapeUtils.getLabel(data),
+          data.hasChildren,
+          data.parentId
+        );
+      case 'PodMetrics':
+        return new PodMetrics(
+          id,
+          data.status,
+          ShapeUtils.getLabel(data),
+          data.hasChildren,
+          data.parentId
+        );
+      case 'ReplicationController':
+        return new ReplicationController(
           id,
           data.status,
           ShapeUtils.getLabel(data),

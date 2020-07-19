@@ -3,6 +3,7 @@
 //
 
 import {
+  ChangeDetectionStrategy,
   Component,
   ElementRef,
   EventEmitter,
@@ -42,6 +43,7 @@ cytoscape('layout', 'octant', octant);
       }
     `,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Cytoscape2Component implements OnChanges {
   @ViewChild('cy', { static: true }) private cy: ElementRef;
@@ -71,13 +73,15 @@ export class Cytoscape2Component implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.elements && this.cytoscape) {
-      this.applied = false;
-      this.cytoscape.nodes('[?hasChildren]').forEach(node => {
-        hideChildren(this.cytoscape, node);
-      });
+    if (changes.elements && changes.elements.currentValue) {
+      if (this.cytoscape) {
+        this.applied = false;
+        this.cytoscape.nodes('[?hasChildren]').forEach(node => {
+          hideChildren(this.cytoscape, node);
+        });
+      }
+      this.render();
     }
-    this.render();
   }
 
   public render() {
