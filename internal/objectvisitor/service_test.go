@@ -21,6 +21,7 @@ func TestService_Visit(t *testing.T) {
 	defer controller.Finish()
 
 	object := testutil.CreateService("service")
+	object.Spec.Selector = map[string]string{"app": "octant",}
 	u := testutil.ToUnstructured(t, object)
 
 	q := queryerFake.NewMockQueryer(controller)
@@ -35,10 +36,12 @@ func TestService_Visit(t *testing.T) {
 
 	handler := fake.NewMockObjectHandler(controller)
 	handler.EXPECT().
-		AddEdge(gomock.Any(), u, testutil.ToUnstructured(t, ingress)).
+		AddEdge(gomock.Any(), objectvisitor.EdgeDefinition{Object: u, Connector: "", ConnectorType: objectvisitor.ConnectorTypeUnknown},
+			objectvisitor.EdgeDefinition{Object: testutil.ToUnstructured(t, ingress), Connector: "", ConnectorType: objectvisitor.ConnectorTypeUnknown}).
 		Return(nil)
 	handler.EXPECT().
-		AddEdge(gomock.Any(), u, testutil.ToUnstructured(t, pod)).
+		AddEdge(gomock.Any(), objectvisitor.EdgeDefinition{Object: u, Connector: "app: octant", ConnectorType: objectvisitor.ConnectorTypeSelector},
+			objectvisitor.EdgeDefinition{Object: testutil.ToUnstructured(t, pod), Connector: "app: octant", ConnectorType: objectvisitor.ConnectorTypeLabel}).
 		Return(nil)
 
 	var visited []unstructured.Unstructured

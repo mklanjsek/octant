@@ -2,6 +2,9 @@ package objectvisitor
 
 import (
 	"context"
+	"fmt"
+	"sort"
+	"strings"
 
 	"github.com/pkg/errors"
 	"go.opencensus.io/trace"
@@ -66,7 +69,9 @@ func (o *Object) Visit(ctx context.Context, object *unstructured.Unstructured, h
 				}
 
 				if !o.isEdgeRedundant(object, owner) {
-					return handler.AddEdge(ctx, object, owner)
+					source:= EdgeDefinition{object, "", ConnectorTypeUnknown}
+					target:= EdgeDefinition{owner, "", ConnectorTypeUnknown}
+					return handler.AddEdge(ctx, source, target)
 				}
 			}
 		}
@@ -90,7 +95,9 @@ func (o *Object) Visit(ctx context.Context, object *unstructured.Unstructured, h
 				}
 
 				if !o.isEdgeRedundant(object, child) {
-					return handler.AddEdge(ctx, object, child)
+					source:= EdgeDefinition{object, "", ConnectorTypeUnknown}
+					target:= EdgeDefinition{child, "", ConnectorTypeUnknown}
+					return handler.AddEdge(ctx, source, target)
 				} else {
 					return nil
 				}
@@ -109,4 +116,14 @@ func (o *Object) isEdgeRedundant(object *unstructured.Unstructured, owner *unstr
 	toBeRemoved := map[string]bool{"ReplicaSet": true, "Deployment": true, "StatefulSet": true, "DaemonSet": true, "Job": true}
 
 	return toBeRemoved[object.GetKind()] || toBeRemoved[owner.GetKind()]
+}
+
+func getSelectorText( selector map[string]string ) string {
+	var values []string
+
+	for k, v := range selector {
+		values= append(values, fmt.Sprintf("%s: %s", k, v))
+	}
+	sort.Strings(values)
+	return strings.Join(values, ", ")
 }

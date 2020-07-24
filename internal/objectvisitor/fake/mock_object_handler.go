@@ -7,6 +7,7 @@ package fake
 import (
 	context "context"
 	gomock "github.com/golang/mock/gomock"
+	objectvisitor "github.com/vmware-tanzu/octant/internal/objectvisitor"
 	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	reflect "reflect"
 )
@@ -35,7 +36,7 @@ func (m *MockObjectHandler) EXPECT() *MockObjectHandlerMockRecorder {
 }
 
 // AddEdge mocks base method
-func (m *MockObjectHandler) AddEdge(arg0 context.Context, arg1, arg2 *unstructured.Unstructured) error {
+func (m *MockObjectHandler) AddEdge(arg0 context.Context, arg1, arg2 objectvisitor.EdgeDefinition) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddEdge", arg0, arg1, arg2)
 	ret0, _ := ret[0].(error)

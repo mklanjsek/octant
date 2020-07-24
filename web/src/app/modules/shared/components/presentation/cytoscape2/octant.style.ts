@@ -68,11 +68,11 @@ export const ELEMENTS_STYLE: Stylesheet[] = [
       'curve-style': 'bezier',
       opacity: 1,
       width: 1.5,
-      'line-color': 'black',
-      'source-arrow-color': 'black',
+      'line-color': 'gray',
+      'source-arrow-color': 'gray',
       'source-arrow-fill': 'hollow',
-      'source-arrow-shape': 'tee',
-      'target-arrow-color': 'black',
+      'source-arrow-shape': 'circle',
+      'target-arrow-color': 'gray',
       'target-arrow-fill': 'hollow',
       'target-arrow-shape': 'triangle-backcurve',
       'arrow-scale': 2,
@@ -93,6 +93,7 @@ export const ELEMENTS_STYLE: Stylesheet[] = [
   {
     selector: '.pod',
     css: {
+      'shape-polygon-points': polygonPoints(-0.5),
       ghost: 'yes',
       'ghost-opacity': 1,
       'ghost-offset-x': 10,
@@ -131,9 +132,11 @@ export const ELEMENTS_STYLE: Stylesheet[] = [
   {
     selector: '.label',
     css: {
-      'background-color': '#13C6CE',
+      shape: 'round-rectangle',
+      color: 'gray',
+      'border-color': '#13C6CE',
       'text-halign': 'center',
-      'border-width': '0px',
+      'border-width': '2px',
       'z-index': 10,
     },
   },
@@ -141,7 +144,12 @@ export const ELEMENTS_STYLE: Stylesheet[] = [
     selector: '.port',
     css: {
       'border-width': '0px',
+      color: 'gray',
       'text-halign': 'center',
+      'padding-left': '0px',
+      'padding-right': '0px',
+      'padding-top': '0px',
+      'padding-bottom': '0px',
       'z-index': 10,
     },
   },
@@ -158,8 +166,10 @@ export const ELEMENTS_STYLE: Stylesheet[] = [
       'padding-right': '0px',
       'padding-top': '0px',
       'padding-bottom': '0px',
-      'text-margin-x': -294,
+      'text-margin-x': node => headerOffset(node),
       'text-margin-y': 0,
+      'text-wrap': 'ellipsis',
+      'text-max-width': node => headerWidth(node),
       'z-index': 10,
     },
   },
@@ -172,16 +182,18 @@ export const ELEMENTS_STYLE: Stylesheet[] = [
   {
     selector: '.header-2',
     css: {
-      'font-size': '14px',
+      'font-size': '16px',
       color: 'gray',
     },
   },
   {
     selector: '.selector',
     css: {
-      'background-color': '#F9C011',
+      shape: 'round-rectangle',
+      color: 'gray',
+      'border-color': '#F9C011',
       'text-halign': 'center',
-      'border-width': '0px',
+      'border-width': '2px',
       'z-index': 10,
     },
   },
@@ -198,11 +210,23 @@ export const ELEMENTS_STYLE: Stylesheet[] = [
       'background-image': renderImage,
       'background-width': '36px',
       'background-height': '36px',
-      'background-position-x': '95%',
-      'background-position-y': '5%',
+      'background-position-x': node => imageOffset(node),
+      'background-position-y': '16px',
     },
   },
 ];
+
+function headerWidth(node): string {
+  return node.width();
+}
+
+function headerOffset(node): number {
+  return 6 - node.width();
+}
+
+function imageOffset(node): string {
+  return `${node.width() - 32}px`;
+}
 
 function nodeColor(node): string {
   switch (node.data('status')) {

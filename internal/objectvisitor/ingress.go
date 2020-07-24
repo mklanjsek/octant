@@ -56,7 +56,9 @@ func (i *Ingress) Visit(ctx context.Context, object *unstructured.Unstructured, 
 				return errors.Wrapf(err, "ingress %s visit service %s",
 					kubernetes.PrintObject(ingress), kubernetes.PrintObject(service))
 			}
-			return handler.AddEdge(ctx, object, service)
+			source:= EdgeDefinition{object, "", ConnectorTypeUnknown}
+			target:= EdgeDefinition{service, "", ConnectorTypeUnknown}
+			return handler.AddEdge(ctx, source, target)
 		})
 
 	}

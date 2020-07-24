@@ -40,7 +40,7 @@ func SetHandlerObjectStatus(objectStatus ObjectStatus) HandlerOption {
 
 type nodesStorage map[types.UID]*unstructured.Unstructured
 
-type adjListStorage map[string]map[string]*unstructured.Unstructured
+type adjListStorage map[string]component.EdgePair
 
 func (als adjListStorage) hasKey(uid string) bool {
 	for k := range als {
@@ -52,34 +52,38 @@ func (als adjListStorage) hasKey(uid string) bool {
 	return false
 }
 
-func (als adjListStorage) hasEdgeForKey(keyUID, edgeUID string) bool {
-	edges, ok := als[keyUID]
-	if !ok {
-		return false
-	}
-
-	_, ok = edges[edgeUID]
+func (als adjListStorage) hasEdgeForKey(keyUID string) bool {
+	_, ok := als[keyUID]
 	return ok
 }
 
 func (als adjListStorage) isEdge(uid string) bool {
-	for k := range als {
-		for edgeUID := range als[k] {
-			if uid == edgeUID {
-				return true
-			}
+	for edgeUID := range als {
+		if uid == edgeUID {
+			return true
 		}
 	}
 
 	return false
 }
 
-func (als adjListStorage) addEdgeForKey(uid, edgeUID string, object *unstructured.Unstructured) {
-	if _, ok := als[uid]; !ok {
-		als[uid] = make(map[string]*unstructured.Unstructured)
+func (als adjListStorage) addEdgeForKey(fromName, toName string, from, to objectvisitor.EdgeDefinition) {
+	uid1:= fmt.Sprintf("%s-%s", fromName, toName)
+	uid2:= fmt.Sprintf("%s-%s", toName, fromName)
+	var key= uid1
+
+	if _, ok := als[uid1]; !ok {
+		key= uid2
+		if _, ok := als[uid2]; !ok {
+			als[key] = component.EdgePair{}
+		}
 	}
 
-	als[uid][edgeUID] = object
+	source:= component.Edge{Node: fromName,	Connector: from.Connector,
+		ConnectorType: string(from.ConnectorType), Type: component.EdgeTypeExplicit,}
+	destination:= component.Edge{Node: toName, Connector: to.Connector,
+		ConnectorType: string(to.ConnectorType), Type: component.EdgeTypeExplicit,}
+	als[key] = component.EdgePair{Source: source, Destination: destination}
 }
 
 // Handler is a visitor handler.
@@ -121,11 +125,11 @@ func NewHandler(dashConfig config.Dash, options ...HandlerOption) (*Handler, err
 }
 
 // AddEdge adds edges to the graph.
-func (h *Handler) AddEdge(ctx context.Context, from, to *unstructured.Unstructured) error {
+func (h *Handler) AddEdge(ctx context.Context, from, to objectvisitor.EdgeDefinition) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
-	fromName, err := edgeName(from)
+	fromName, err := edgeName(from.Object)
 	if err != nil {
 		if isSkippedNode(err) {
 			return nil
@@ -133,7 +137,7 @@ func (h *Handler) AddEdge(ctx context.Context, from, to *unstructured.Unstructur
 		return errors.Wrap(err, "could not generate from edge")
 	}
 
-	toName, err := edgeName(to)
+	toName, err := edgeName(to.Object)
 	if err != nil {
 		if isSkippedNode(err) {
 			return nil
@@ -141,25 +145,9 @@ func (h *Handler) AddEdge(ctx context.Context, from, to *unstructured.Unstructur
 		return errors.Wrap(err, "could not generate to edge")
 	}
 
-	// is from a key in the adjacency list?
-	if h.adjList.hasKey(fromName) {
-		if !h.adjList.hasEdgeForKey(toName, fromName) {
-			// add to to from
-			h.adjList.addEdgeForKey(fromName, toName, to)
-		}
-	} else {
-		// is to a key in the adjacency list?
-		if h.adjList.hasKey(toName) {
-			// add from to to
-			h.adjList.addEdgeForKey(toName, fromName, from)
-		} else {
-			// add to to from
-			h.adjList.addEdgeForKey(fromName, toName, to)
-		}
-	}
-
-	h.addNode(fromName, from)
-	h.addNode(toName, to)
+	h.adjList.addEdgeForKey(fromName, toName, from, to)
+	h.addNode(fromName, from.Object)
+	h.addNode(toName, to.Object)
 
 	return nil
 }
@@ -188,18 +176,7 @@ func (h *Handler) AdjacencyList() (*component.AdjList, error) {
 	list := component.AdjList{}
 
 	for k, v := range h.adjList {
-		for edgeName := range v {
-
-			list[k] = append(list[k], component.Edge{
-				Node: edgeName,
-				Type: component.EdgeTypeExplicit,
-			})
-		}
-
-		// sort the edges by node to make them easier to compare
-		sort.Slice(list[k], func(i, j int) bool {
-			return list[k][i].Node < list[k][j].Node
-		})
+		list[k] = v
 	}
 
 	return &list, nil

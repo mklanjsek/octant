@@ -29,6 +29,7 @@ func TestPod_Visit(t *testing.T) {
 
 	q := queryerFake.NewMockQueryer(controller)
 	service := testutil.CreateService("service")
+	service.Spec.Selector = map[string]string{"app": "octant",}
 	q.EXPECT().
 		ServicesForPod(gomock.Any(), object).
 		Return([]*corev1.Service{service}, nil)
@@ -43,16 +44,21 @@ func TestPod_Visit(t *testing.T) {
 		Return([]*corev1.Secret{secret}, nil)
 
 	handler := fake.NewMockObjectHandler(controller)
+
 	handler.EXPECT().
-		AddEdge(gomock.Any(), u, testutil.ToUnstructured(t, service)).
+		AddEdge(gomock.Any(), objectvisitor.EdgeDefinition{Object: u, Connector: "app: octant", ConnectorType: objectvisitor.ConnectorTypeLabel},
+			objectvisitor.EdgeDefinition{Object: testutil.ToUnstructured(t, service), Connector: "app: octant", ConnectorType: objectvisitor.ConnectorTypeSelector}).
 		Return(nil)
 	handler.EXPECT().
-		AddEdge(gomock.Any(), u, testutil.ToUnstructured(t, serviceAccount)).
+		AddEdge(gomock.Any(), objectvisitor.EdgeDefinition{Object: u, Connector: "serviceAccount: service-account", ConnectorType: objectvisitor.ConnectorTypeName},
+			objectvisitor.EdgeDefinition{Object: testutil.ToUnstructured(t, serviceAccount), Connector: "name: service-account", ConnectorType: objectvisitor.ConnectorTypeName}).
 		Return(nil)
 	handler.EXPECT().
-		AddEdge(gomock.Any(), u, testutil.ToUnstructured(t, configMap)).
+		AddEdge(gomock.Any(), objectvisitor.EdgeDefinition{Object: u, Connector: "name: configmap", ConnectorType: objectvisitor.ConnectorTypeName},
+			objectvisitor.EdgeDefinition{Object: testutil.ToUnstructured(t, configMap), Connector: "configMap.name: configmap", ConnectorType: objectvisitor.ConnectorTypeName}).
 		Return(nil)
-	handler.EXPECT().AddEdge(gomock.Any(), testutil.ToUnstructured(t, serviceAccount), testutil.ToUnstructured(t, secret)).
+	handler.EXPECT().AddEdge(gomock.Any(), objectvisitor.EdgeDefinition{Object: testutil.ToUnstructured(t, serviceAccount), Connector: "secrets.name: secret", ConnectorType: objectvisitor.ConnectorTypeName},
+			objectvisitor.EdgeDefinition{Object: testutil.ToUnstructured(t, secret), Connector: "name: secret", ConnectorType: objectvisitor.ConnectorTypeName}).
 		Return(nil)
 
 	var visited []unstructured.Unstructured

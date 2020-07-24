@@ -2,7 +2,7 @@ package objectvisitor
 
 import (
 	"context"
-
+	"fmt"
 	"github.com/pkg/errors"
 	"go.opencensus.io/trace"
 	"golang.org/x/sync/errgroup"
@@ -69,8 +69,11 @@ func (p *Pod) Visit(ctx context.Context, object *unstructured.Unstructured, hand
 					return errors.Wrapf(err, "pod %s visit service %s",
 						kubernetes.PrintObject(pod), kubernetes.PrintObject(service))
 				}
+				selector:= getSelectorText(service.Spec.Selector)
+				source:= EdgeDefinition{object, selector, ConnectorTypeLabel}
+				target:= EdgeDefinition{u, selector, ConnectorTypeSelector}
 
-				return handler.AddEdge(ctx, object, u)
+				return handler.AddEdge(ctx, source, target)
 			})
 		}
 
@@ -94,7 +97,9 @@ func (p *Pod) Visit(ctx context.Context, object *unstructured.Unstructured, hand
 					return errors.Wrapf(err, "pod %s visit service account %s",
 						kubernetes.PrintObject(pod), kubernetes.PrintObject(serviceAccount))
 				}
-				handler.AddEdge(ctx, object, uServiceAccount)
+				source:= EdgeDefinition{object, fmt.Sprintf("serviceAccount: %s",uServiceAccount.GetName()), ConnectorTypeName}
+				target:= EdgeDefinition{uServiceAccount, fmt.Sprintf("name: %s",uServiceAccount.GetName()), ConnectorTypeName}
+				handler.AddEdge(ctx, source, target)
 
 				g.Go(func() error {
 					secrets, err := p.queryer.SecretsForPod(ctx, pod)
@@ -110,7 +115,9 @@ func (p *Pod) Visit(ctx context.Context, object *unstructured.Unstructured, hand
 								return err
 							}
 							uSecret := &unstructured.Unstructured{Object: m}
-							return handler.AddEdge(ctx, uServiceAccount, uSecret)
+							source:= EdgeDefinition{uServiceAccount, fmt.Sprintf("secrets.name: %s",uSecret.GetName()), ConnectorTypeName}
+							target:= EdgeDefinition{uSecret, fmt.Sprintf("name: %s",uSecret.GetName()), ConnectorTypeName}
+							return handler.AddEdge(ctx, source, target)
 						})
 					}
 					return nil
@@ -135,7 +142,9 @@ func (p *Pod) Visit(ctx context.Context, object *unstructured.Unstructured, hand
 					return err
 				}
 				u := &unstructured.Unstructured{Object: m}
-				return handler.AddEdge(ctx, object, u)
+				source:= EdgeDefinition{object, fmt.Sprintf("name: %s", configMap.Name), ConnectorTypeName}
+				target:= EdgeDefinition{u, fmt.Sprintf("configMap.name: %s", configMap.Name), ConnectorTypeName}
+				return handler.AddEdge(ctx, source, target)
 			})
 		}
 

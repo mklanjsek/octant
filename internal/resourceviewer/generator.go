@@ -35,12 +35,9 @@ func GenerateComponent(ctx context.Context, details Details, selected types.UID)
 		return nil, err
 	}
 
-	for k, list := range *edges {
-		for i := range list {
-			item := list[i]
-			if err := rv.AddEdge(k, item.Node, item.Type); err != nil {
-				return nil, err
-			}
+	for k, item := range *edges {
+		if err := rv.AddEdge(k, item); err != nil {
+			return nil, err
 		}
 	}
 

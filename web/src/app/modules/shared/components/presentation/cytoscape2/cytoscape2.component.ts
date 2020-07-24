@@ -9,6 +9,7 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnInit,
   Output,
   Renderer2,
   SimpleChanges,
@@ -45,7 +46,7 @@ cytoscape('layout', 'octant', octant);
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Cytoscape2Component implements OnChanges {
+export class Cytoscape2Component implements OnChanges, OnInit {
   @ViewChild('cy', { static: true }) private cy: ElementRef;
   @Input() public elements: any;
   @Input() public layout: any;
@@ -70,6 +71,12 @@ export class Cytoscape2Component implements OnChanges {
       min: 0.1,
       max: 1.5,
     };
+  }
+
+  ngOnInit(): void {
+    if(this.cytoscape && this.cytoscape.nodes() && this.cytoscape.nodes().first()) {
+      this.select.emit(this.cytoscape.nodes().first().data());
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -136,6 +143,7 @@ export class Cytoscape2Component implements OnChanges {
     this.cytoscape.on('dragfree', 'node', e => {
       const node: NodeSingular = e.target;
       layoutChildren(this.cytoscape, node);
+      localSelect.emit(node.data());
       this.moveStarted = false;
     });
   }

@@ -20,14 +20,6 @@ import { ElementsDefinition, Stylesheet } from 'cytoscape';
 import { ShapeUtils } from '../cytoscape2/shape.utils';
 import { Router } from '@angular/router';
 
-const statusColorCodes = {
-  ok: '#60b515',
-  warning: '#f57600',
-  error: '#e12200',
-};
-
-const edgeColorCode = '#003d79';
-
 @Component({
   selector: 'app-view-resource-viewer',
   templateUrl: './resource-viewer.component.html',
@@ -49,14 +41,6 @@ export class ResourceViewerComponent implements OnChanges, AfterViewInit {
   selectedNode: Node;
 
   layout = {
-    name: 'dagre',
-    padding: 30,
-    rankDir: 'TB',
-    directed: true,
-    animate: false,
-  };
-
-  layout2 = {
     name: 'cose-bilkent',
     padding: 30,
     fit: false,
@@ -68,55 +52,7 @@ export class ResourceViewerComponent implements OnChanges, AfterViewInit {
     max: 4.0,
   };
 
-  style: Stylesheet[] = [
-    {
-      selector: 'node',
-      css: {
-        shape: 'rectangle',
-        width: 'label',
-        height: 'label',
-        content: 'data(name)',
-        'background-color': 'data(colorCode)',
-        color: '#fff',
-        'font-size': 12,
-        'text-wrap': 'wrap',
-        'text-valign': 'center',
-        'padding-left': '10px',
-        'padding-right': '10px',
-        'padding-top': '10px',
-        'padding-bottom': '10px',
-      },
-    },
-
-    {
-      selector: 'node:selected',
-      css: {
-        'curve-style': 'bezier',
-        'line-color': 'data(colorCode)',
-        'source-arrow-color': 'data(colorCode)',
-        'target-arrow-color': 'data(colorCode)',
-        'border-width': 1,
-        'border-color': '#313131',
-        'border-style': 'solid',
-      },
-    },
-
-    {
-      selector: 'edge',
-      css: {
-        'curve-style': 'bezier',
-        opacity: 0.666,
-        width: 'mapData(strength, 70, 100, 1, 3)',
-        'line-color': 'data(colorCode)',
-        'source-arrow-color': 'data(colorCode)',
-        'target-arrow-color': 'data(colorCode)',
-      },
-    },
-  ];
-
   graphData: ElementsDefinition;
-  graphData2: ElementsDefinition;
-
   private afterFirstChange: boolean;
 
   constructor(private router: Router) {}
@@ -124,7 +60,6 @@ export class ResourceViewerComponent implements OnChanges, AfterViewInit {
   ngAfterViewInit(): void {
     if (this.afterFirstChange) {
       this.graphData = this.generateGraphData();
-      this.graphData2 = this.generateGraphData2();
     }
   }
 
@@ -138,7 +73,6 @@ export class ResourceViewerComponent implements OnChanges, AfterViewInit {
       this.currentView = changes.view.currentValue as ResourceViewerView;
       this.select(this.currentView.config.selected);
       this.graphData = this.generateGraphData();
-      this.graphData2 = this.generateGraphData2();
       this.afterFirstChange = true;
     }
   }
@@ -154,63 +88,8 @@ export class ResourceViewerComponent implements OnChanges, AfterViewInit {
     }
   }
 
-  generateGraphData2(): ElementsDefinition {
-    // console.log('data', JSON.stringify(this.currentView.config));
+  generateGraphData(): ElementsDefinition {
     return ShapeUtils.loadShapes(this.currentView.config);
-  }
-
-  generateGraphData() {
-    return {
-      nodes: this.nodes(),
-      edges: this.edges(),
-    };
-  }
-
-  private nodes() {
-    if (!this.currentView || !this.currentView.config.nodes) {
-      return [];
-    }
-
-    const nodes = Object.entries(this.currentView.config.nodes).map(
-      ([name, details]) => {
-        const colorCode =
-          statusColorCodes[details.status] || statusColorCodes.error;
-
-        return {
-          data: {
-            id: name,
-            name: `${details.name}\n${details.apiVersion} ${details.kind}`,
-            weight: 100,
-            colorCode,
-          },
-        };
-      }
-    );
-
-    return Array.prototype.concat(...nodes);
-  }
-
-  private edges() {
-    if (!this.currentView || !this.currentView.config.edges) {
-      return [];
-    }
-
-    const edges = Object.entries(this.currentView.config.edges).map(
-      ([parent, maps]) => {
-        return maps.map(edge => {
-          return {
-            data: {
-              source: parent,
-              target: edge.node,
-              colorCode: edgeColorCode,
-              strength: 10,
-            },
-          };
-        });
-      }
-    );
-
-    return Array.prototype.concat(...edges);
   }
 
   private select(id: string) {

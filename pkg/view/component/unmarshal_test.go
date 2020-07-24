@@ -262,24 +262,20 @@ func Test_unmarshal(t *testing.T) {
 			expected: &ResourceViewer{
 				Config: ResourceViewerConfig{
 					Edges: AdjList{
-						"69e4ea11-2985-11e9-b356-42010a8000e5": []Edge{
-							{
-								Node: "bf4800b5b6602c4c78ba3b654af02b3b",
-								Type: "explicit",
-							},
+						"69e4ea11-2985-11e9-b356-42010a8000e5-bf4800b5b6602c4c78ba3b654af02b3b":
+						EdgePair{
+							Source: Edge{Node: "69e4ea11-2985-11e9-b356-42010a8000e5", Connector: "", ConnectorType: "name", Type: "explicit"},
+							Destination: Edge{Node: "bf4800b5b6602c4c78ba3b654af02b3b", Connector: "", ConnectorType: "name", Type: "explicit"},
 						},
-						"71c2b4eb-2949-11e9-b356-42010a8000e5": []Edge{
-							{
-								Node: "8682460a-29b5-11e9-b356-42010a8000e5",
-								Type: "explicit",
-							},
+						"71c2b4eb-2949-11e9-b356-42010a8000e5-8682460a-29b5-11e9-b356-42010a8000e5":
+						EdgePair{
+							Source: Edge{Node: "71c2b4eb-2949-11e9-b356-42010a8000e5", Connector: "", ConnectorType: "name", Type: "explicit"},
+							Destination: Edge{Node: "8682460a-29b5-11e9-b356-42010a8000e5", Connector: "", ConnectorType: "name", Type: "explicit"},
 						},
-						"8682460a-29b5-11e9-b356-42010a8000e5": []Edge{
-							{
-								Node: "bf4800b5b6602c4c78ba3b654af02b3b",
-								Type: "explicit",
-							},
-						},
+						"8682460a-29b5-11e9-b356-42010a8000e5-bf4800b5b6602c4c78ba3b654af02b3b":
+						EdgePair{
+							Source: Edge{Node: "8682460a-29b5-11e9-b356-42010a8000e5", Connector: "", ConnectorType: "name", Type: "explicit"},
+							Destination: Edge{Node: "bf4800b5b6602c4c78ba3b654af02b3b", Connector: "", ConnectorType: "name", Type: "explicit"}},
 					},
 					Nodes: Nodes{
 						"69e4ea11-2985-11e9-b356-42010a8000e5": Node{

@@ -34,11 +34,9 @@ func TestGenerateComponent(t *testing.T) {
 		Return(nodes, nil)
 
 	adjList := &component.AdjList{
-		deployment.Name: []component.Edge{
-			{
-				Node: replicaSet.Name,
-				Type: component.EdgeTypeImplicit,
-			},
+		deployment.Name: component.EdgePair{
+			Source:	component.Edge{Node: deployment.Name, Connector: "", ConnectorType: "name", Type: component.EdgeTypeExplicit},
+			Destination: component.Edge{Node: replicaSet.Name, Connector: "", ConnectorType: "name", Type: component.EdgeTypeExplicit},
 		},
 	}
 	details.EXPECT().
@@ -57,9 +55,7 @@ func TestGenerateComponent(t *testing.T) {
 	}
 
 	for name, edges := range *adjList {
-		for _, edge := range edges {
-			require.NoError(t, expected.AddEdge(name, edge.Node, edge.Type))
-		}
+		require.NoError(t, expected.AddEdge(name, edges))
 	}
 
 	expected.Select(string(deployment.UID))

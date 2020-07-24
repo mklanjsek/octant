@@ -7,29 +7,28 @@ package component
 
 import (
 	"encoding/json"
-	"strings"
-
 	"github.com/pkg/errors"
 )
 
+type EdgePair struct {
+	Source Edge `json:"source"`
+	Destination Edge `json:"destination"`
+}
+
 // AdjList is an adjacency list - it maps nodes to edges
-type AdjList map[string][]Edge
+type AdjList map[string]EdgePair
 
 // Edge represents a directed edge in a graph
 type Edge struct {
-	Node string   `json:"node"`
-	Type EdgeType `json:"edge"`
+	Node 			string `json:"node"`
+	Connector 	  	string `json:"connector"`
+	ConnectorType 	string `json:"connectorType"`
+	Type 			EdgeType `json:"edge"`
 }
 
 // Add adds a directed edge to the adjacency list
-func (al AdjList) Add(src string, edge Edge) {
-	edges, ok := al[src]
-	if !ok || edges == nil {
-		edges = make([]Edge, 0)
-	}
-
-	edges = append(edges, edge)
-	al[src] = edges
+func (al AdjList) Add(src string, edge EdgePair) {
+	al[src] = edge
 }
 
 type NodeStatus string
@@ -96,22 +95,8 @@ func NewResourceViewer(title string) *ResourceViewer {
 
 }
 
-func (rv *ResourceViewer) AddEdge(nodeID, childID string, edgeType EdgeType) error {
-	if _, ok := rv.Config.Nodes[childID]; !ok {
-		var nodeIDs []string
-		for k := range rv.Config.Nodes {
-			nodeIDs = append(nodeIDs, k)
-		}
-		return errors.Errorf("node %q does not exist in graph. available [%s]",
-			childID, strings.Join(nodeIDs, ", "))
-	}
-
-	edge := Edge{
-		Node: childID,
-		Type: edgeType,
-	}
-	rv.Config.Edges[nodeID] = append(rv.Config.Edges[nodeID], edge)
-
+func (rv *ResourceViewer) AddEdge(nodeID string, edge EdgePair) error {
+	rv.Config.Edges[nodeID] = edge
 	return nil
 }
 
@@ -128,19 +113,12 @@ func (rv *ResourceViewer) GetMetadata() Metadata {
 }
 
 func (rv *ResourceViewer) Validate() error {
-	for nodeID, edges := range rv.Config.Edges {
-		if _, ok := rv.Config.Nodes[nodeID]; !ok {
-			var nodes []string
-			for node := range rv.Config.Nodes {
-				nodes = append(nodes, node)
-			}
-			return errors.Errorf("node %q in edges does not have a node entry. existing nodes: %s", nodeID, strings.Join(nodes, ", "))
+	for _, edges := range rv.Config.Edges {
+		if _, ok := rv.Config.Nodes[edges.Source.Node]; !ok {
+			return errors.Errorf("Source node %q in edges does not have a node entry", edges.Source.Node)
 		}
-
-		for _, edge := range edges {
-			if _, ok := rv.Config.Nodes[edge.Node]; !ok {
-				return errors.Errorf("edge %q from node %q does not have a node entry", edge.Node, nodeID)
-			}
+		if _, ok := rv.Config.Nodes[edges.Destination.Node]; !ok {
+			return errors.Errorf("Destination node %q in edges does not have a node entry", edges.Destination.Node)
 		}
 	}
 

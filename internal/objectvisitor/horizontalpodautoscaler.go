@@ -58,7 +58,9 @@ func (s *HorizontalPodAutoscaler) Visit(ctx context.Context, object *unstructure
 						kubernetes.PrintObject(hpa))
 				}
 
-				return handler.AddEdge(ctx, object, u)
+				source:= EdgeDefinition{object, "", ConnectorTypeUnknown}
+				target:= EdgeDefinition{u, "", ConnectorTypeUnknown}
+				return handler.AddEdge(ctx, source, target)
 			})
 		}
 

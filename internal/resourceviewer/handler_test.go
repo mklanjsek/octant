@@ -3,6 +3,7 @@ package resourceviewer
 import (
 	"context"
 	"fmt"
+	"github.com/vmware-tanzu/octant/internal/objectvisitor"
 	"path"
 	"testing"
 
@@ -90,8 +91,10 @@ func TestHandler(t *testing.T) {
 	ctx := context.Background()
 	mockRelations := func(a *unstructured.Unstructured, objects ...*unstructured.Unstructured) {
 		for _, b := range objects {
-			require.NoError(t, handler.AddEdge(ctx, a, b))
-			require.NoError(t, handler.AddEdge(ctx, b, a))
+			edgeA:= objectvisitor.EdgeDefinition{Object: a, Connector: "", ConnectorType: objectvisitor.ConnectorTypeName}
+			edgeB:= objectvisitor.EdgeDefinition{Object: b, Connector: "", ConnectorType: objectvisitor.ConnectorTypeName}
+			require.NoError(t, handler.AddEdge(ctx, edgeA, edgeB))
+			require.NoError(t, handler.AddEdge(ctx, edgeB, edgeA))
 			require.NoError(t, handler.Process(ctx, b))
 		}
 		require.NoError(t, handler.Process(ctx, a))
@@ -105,10 +108,14 @@ func TestHandler(t *testing.T) {
 	mockRelations(service1Unstructured, pod4Unstructured)
 
 	require.NoError(t, handler.Process(ctx, pod3Unstructured))
-	require.NoError(t, handler.AddEdge(ctx, pod1Unstructured, serviceAccountUnstructured))
-	require.NoError(t, handler.AddEdge(ctx, pod2Unstructured, serviceAccountUnstructured))
-	require.NoError(t, handler.AddEdge(ctx, pod3Unstructured, serviceAccountUnstructured))
-	require.NoError(t, handler.AddEdge(ctx, pod4Unstructured, serviceAccountUnstructured))
+	require.NoError(t, handler.AddEdge(ctx, objectvisitor.EdgeDefinition{Object: pod1Unstructured, Connector: "", ConnectorType: objectvisitor.ConnectorTypeName},
+		objectvisitor.EdgeDefinition{Object: serviceAccountUnstructured, Connector: "", ConnectorType: objectvisitor.ConnectorTypeName}))
+	require.NoError(t, handler.AddEdge(ctx, objectvisitor.EdgeDefinition{Object: pod2Unstructured, Connector: "", ConnectorType: objectvisitor.ConnectorTypeName},
+		objectvisitor.EdgeDefinition{Object: serviceAccountUnstructured, Connector: "", ConnectorType: objectvisitor.ConnectorTypeName}))
+	require.NoError(t, handler.AddEdge(ctx, objectvisitor.EdgeDefinition{Object: pod3Unstructured, Connector: "", ConnectorType: objectvisitor.ConnectorTypeName},
+		objectvisitor.EdgeDefinition{Object: serviceAccountUnstructured, Connector: "", ConnectorType: objectvisitor.ConnectorTypeName}))
+	require.NoError(t, handler.AddEdge(ctx, objectvisitor.EdgeDefinition{Object: pod4Unstructured, Connector: "", ConnectorType: objectvisitor.ConnectorTypeName},
+		objectvisitor.EdgeDefinition{Object: serviceAccountUnstructured, Connector: "", ConnectorType: objectvisitor.ConnectorTypeName}))
 	require.NoError(t, handler.Process(ctx, serviceAccountUnstructured))
 
 	mockLinkPath(t, dashConfig, cr)
@@ -123,31 +130,45 @@ func TestHandler(t *testing.T) {
 	mockLinkPath(t, dashConfig, service1)
 
 	expectedAdjList := &component.AdjList{
-		string(cr.UID): {
-			{Node: string(deployment.UID), Type: component.EdgeTypeExplicit},
+		fmt.Sprintf("%s-%s", string(deployment.UID), string(cr.UID)): component.EdgePair{
+			Source:	component.Edge{Node: string(deployment.UID), Connector: "", ConnectorType: "name", Type: component.EdgeTypeExplicit},
+			Destination: component.Edge{Node: string(cr.UID), Connector: "", ConnectorType: "name", Type: component.EdgeTypeExplicit},
 		},
-		string(deployment.UID): {
-			{Node: string(replicaSet1.UID), Type: component.EdgeTypeExplicit},
-			{Node: string(replicaSet3.UID), Type: component.EdgeTypeExplicit},
+		fmt.Sprintf("%s pods-%s", replicaSet1.Name, replicaSet1.Name): component.EdgePair{
+			Source:	component.Edge{Node: fmt.Sprintf("%s pods", replicaSet1.Name), Connector: "", ConnectorType: "name", Type: component.EdgeTypeExplicit},
+			Destination: component.Edge{Node: replicaSet1.Name, Connector: "", ConnectorType: "name", Type: component.EdgeTypeExplicit},
 		},
-		fmt.Sprintf("%s pods", replicaSet1.Name): {
-			{Node: string(serviceAccount.UID), Type: component.EdgeTypeExplicit},
+		fmt.Sprintf("%s pods-%s", replicaSet1.Name, service1.Name): component.EdgePair{
+			Source:	component.Edge{Node: fmt.Sprintf("%s pods", replicaSet1.Name), Connector: "", ConnectorType: "name", Type: component.EdgeTypeExplicit},
+			Destination: component.Edge{Node: service1.Name, Connector: "", ConnectorType: "name", Type: component.EdgeTypeExplicit},
 		},
-		fmt.Sprintf("%s pods", replicaSet3.Name): {
-			{Node: string(serviceAccount.UID), Type: component.EdgeTypeExplicit},
+		fmt.Sprintf("%s-%s", replicaSet1.Name, deployment.Name): component.EdgePair{
+			Source:	component.Edge{Node: fmt.Sprintf("%s", replicaSet1.Name), Connector: "", ConnectorType: "name", Type: component.EdgeTypeExplicit},
+			Destination: component.Edge{Node: deployment.Name, Connector: "", ConnectorType: "name", Type: component.EdgeTypeExplicit},
 		},
-		string(pod3.UID): {
-			{Node: string(serviceAccount.UID), Type: component.EdgeTypeExplicit},
+		fmt.Sprintf("%s pods-%s", replicaSet3.Name, replicaSet3.Name): component.EdgePair{
+			Source:	component.Edge{Node: fmt.Sprintf("%s pods", replicaSet3.Name), Connector: "", ConnectorType: "name", Type: component.EdgeTypeExplicit},
+			Destination: component.Edge{Node: replicaSet3.Name, Connector: "", ConnectorType: "name", Type: component.EdgeTypeExplicit},
 		},
-		string(replicaSet1.UID): {
-			{Node: fmt.Sprintf("%s pods", replicaSet1.Name), Type: component.EdgeTypeExplicit},
+		fmt.Sprintf("%s pods-%s", replicaSet3.Name, service1.Name): component.EdgePair{
+			Source:	component.Edge{Node: fmt.Sprintf("%s pods", replicaSet3.Name), Connector: "", ConnectorType: "name", Type: component.EdgeTypeExplicit},
+			Destination: component.Edge{Node: service1.Name, Connector: "", ConnectorType: "name", Type: component.EdgeTypeExplicit},
 		},
-		string(replicaSet3.UID): {
-			{Node: fmt.Sprintf("%s pods", replicaSet3.Name), Type: component.EdgeTypeExplicit},
+		fmt.Sprintf("%s-%s", replicaSet3.Name, deployment.Name): component.EdgePair{
+			Source:	component.Edge{Node: fmt.Sprintf("%s", replicaSet3.Name), Connector: "", ConnectorType: "name", Type: component.EdgeTypeExplicit},
+			Destination: component.Edge{Node: deployment.Name, Connector: "", ConnectorType: "name", Type: component.EdgeTypeExplicit},
 		},
-		string(service1.UID): {
-			{Node: fmt.Sprintf("%s pods", replicaSet1.Name), Type: component.EdgeTypeExplicit},
-			{Node: fmt.Sprintf("%s pods", replicaSet3.Name), Type: component.EdgeTypeExplicit},
+		fmt.Sprintf("%s-%s pods", serviceAccount.Name, replicaSet3.Name): component.EdgePair{
+			Source:	component.Edge{Node: fmt.Sprintf("%s pods", replicaSet3.Name), Connector: "", ConnectorType: "name", Type: component.EdgeTypeExplicit},
+			Destination: component.Edge{Node: serviceAccount.Name, Connector: "", ConnectorType: "name", Type: component.EdgeTypeExplicit},
+		},
+		fmt.Sprintf("%s-%s pods", serviceAccount.Name, replicaSet1.Name): component.EdgePair{
+			Source:	component.Edge{Node: fmt.Sprintf("%s pods", replicaSet1.Name), Connector: "", ConnectorType: "name", Type: component.EdgeTypeExplicit},
+			Destination: component.Edge{Node: serviceAccount.Name, Connector: "", ConnectorType: "name", Type: component.EdgeTypeExplicit},
+		},
+		fmt.Sprintf("%s-%s", serviceAccount.Name, pod3.Name): component.EdgePair{
+			Source:	component.Edge{Node: pod3.Name, Connector: "", ConnectorType: "name", Type: component.EdgeTypeExplicit},
+			Destination: component.Edge{Node: fmt.Sprintf("%s", serviceAccount.Name), Connector: "", ConnectorType: "name", Type: component.EdgeTypeExplicit},
 		},
 	}
 
@@ -362,10 +383,10 @@ func Test_isObjectParent(t *testing.T) {
 func Test_adjListStorage(t *testing.T) {
 	als := &adjListStorage{}
 
-	assert.False(t, als.hasEdgeForKey("1", "2"))
-	als.addEdgeForKey("1", "2", nil)
-	assert.True(t, als.hasEdgeForKey("1", "2"))
-	assert.True(t, als.hasKey("1"))
+	assert.False(t, als.hasEdgeForKey("1"))
+	als.addEdgeForKey("1", "2", objectvisitor.EdgeDefinition{}, objectvisitor.EdgeDefinition{})
+	assert.True(t, als.hasEdgeForKey("2-1"))
+	assert.True(t, als.hasKey("2-1"))
 }
 
 func mockLinkPath(t *testing.T, dashConfig *configFake.MockDash, object runtime.Object) {
@@ -429,8 +450,10 @@ func Test_establishRelations(t *testing.T) {
 	ctx := context.Background()
 	mockRelations := func(a *unstructured.Unstructured, objects ...*unstructured.Unstructured) {
 		for _, b := range objects {
-			require.NoError(t, handler.AddEdge(ctx, a, b))
-			require.NoError(t, handler.AddEdge(ctx, b, a))
+			edgeA:= objectvisitor.EdgeDefinition{Object: a, Connector: "", ConnectorType: objectvisitor.ConnectorTypeName}
+			edgeB:= objectvisitor.EdgeDefinition{Object: b, Connector: "", ConnectorType: objectvisitor.ConnectorTypeName}
+			require.NoError(t, handler.AddEdge(ctx, edgeA, edgeB))
+			require.NoError(t, handler.AddEdge(ctx, edgeB, edgeA))
 			require.NoError(t, handler.Process(ctx, b))
 		}
 		require.NoError(t, handler.Process(ctx, a))
@@ -440,8 +463,10 @@ func Test_establishRelations(t *testing.T) {
 	mockRelations(replicaSetUnstructured, pod1Unstructured, pod2Unstructured)
 	mockRelations(serviceUnstructured, pod1Unstructured, pod2Unstructured)
 
-	require.NoError(t, handler.AddEdge(ctx, pod1Unstructured, serviceAccountUnstructured))
-	require.NoError(t, handler.AddEdge(ctx, pod2Unstructured, serviceAccountUnstructured))
+	require.NoError(t, handler.AddEdge(ctx,objectvisitor.EdgeDefinition{Object: pod1Unstructured, Connector: "", ConnectorType: objectvisitor.ConnectorTypeName},
+		objectvisitor.EdgeDefinition{Object: serviceAccountUnstructured, Connector: "", ConnectorType: objectvisitor.ConnectorTypeName}))
+	require.NoError(t, handler.AddEdge(ctx, objectvisitor.EdgeDefinition{Object: pod2Unstructured, Connector: "", ConnectorType: objectvisitor.ConnectorTypeName},
+		objectvisitor.EdgeDefinition{Object: serviceAccountUnstructured, Connector: "", ConnectorType: objectvisitor.ConnectorTypeName}))
 	require.NoError(t, handler.Process(ctx, serviceAccountUnstructured))
 
 	mockLinkPath(t, dashConfig, deployment)
@@ -452,18 +477,10 @@ func Test_establishRelations(t *testing.T) {
 	mockLinkPath(t, dashConfig, service)
 
 	expectedAdjList := &component.AdjList{
-		string(deployment.UID): {
-			{Node: string(replicaSet.UID), Type: component.EdgeTypeExplicit},
-		},
-		fmt.Sprintf("%s pods", replicaSet.Name): {
-			{Node: string(serviceAccount.UID), Type: component.EdgeTypeExplicit},
-		},
-		string(replicaSet.UID): {
-			{Node: fmt.Sprintf("%s pods", replicaSet.Name), Type: component.EdgeTypeExplicit},
-		},
-		string(service.UID): {
-			{Node: fmt.Sprintf("%s pods", replicaSet.Name), Type: component.EdgeTypeExplicit},
-		},
+		"replica-set pods-replica-set":     component.EdgePair{Source: component.Edge{Node: "replica-set pods", Connector: "", ConnectorType: "name", Type: "explicit"}, Destination: component.Edge{Node: "replica-set", Connector: "", ConnectorType: "name", Type: "explicit"}},
+		"replica-set pods-service":         component.EdgePair{Source: component.Edge{Node: "replica-set pods", Connector: "", ConnectorType: "name", Type: "explicit"}, Destination: component.Edge{Node: "service", Connector: "", ConnectorType: "name", Type: "explicit"}},
+		"replica-set-deployment":           component.EdgePair{Source: component.Edge{Node: "replica-set", Connector: "", ConnectorType: "name", Type: "explicit"}, Destination: component.Edge{Node: "deployment", Connector: "", ConnectorType: "name", Type: "explicit"}},
+		"service-account-replica-set pods": component.EdgePair{Source: component.Edge{Node: "replica-set pods", Connector: "", ConnectorType: "name", Type: "explicit"}, Destination: component.Edge{Node: "service-account", Connector: "", ConnectorType: "name", Type: "explicit"}},
 	}
 
 	list, err := handler.AdjacencyList()

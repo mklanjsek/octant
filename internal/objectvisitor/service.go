@@ -63,7 +63,10 @@ func (s *Service) Visit(ctx context.Context, object *unstructured.Unstructured, 
 					return err
 				}
 
-				return handler.AddEdge(ctx, object, u)
+				selectorString:= getSelectorText(service.Spec.Selector)
+				source:= EdgeDefinition{object, selectorString, ConnectorTypeSelector}
+				target:= EdgeDefinition{u, selectorString, ConnectorTypeLabel}
+				return handler.AddEdge(ctx, source, target)
 			})
 
 		}
@@ -90,7 +93,9 @@ func (s *Service) Visit(ctx context.Context, object *unstructured.Unstructured, 
 						kubernetes.PrintObject(service), kubernetes.PrintObject(ingress))
 				}
 
-				return handler.AddEdge(ctx, object, u)
+				source:= EdgeDefinition{object, "", ConnectorTypeUnknown}
+				target:= EdgeDefinition{u, "", ConnectorTypeUnknown}
+				return handler.AddEdge(ctx, source, target)
 			})
 		}
 

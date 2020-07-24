@@ -10,24 +10,48 @@
   },
   "config": {
     "edges": {
-      "69e4ea11-2985-11e9-b356-42010a8000e5": [
-        {
+      "69e4ea11-2985-11e9-b356-42010a8000e5-bf4800b5b6602c4c78ba3b654af02b3b": {
+        "source": {
+          "node": "69e4ea11-2985-11e9-b356-42010a8000e5",
+          "connector": "",
+          "connectorType": "name",
+          "edge": "explicit"
+        },
+        "destination": {
           "node": "bf4800b5b6602c4c78ba3b654af02b3b",
+          "connector": "",
+          "connectorType": "name",
           "edge": "explicit"
         }
-      ],
-      "71c2b4eb-2949-11e9-b356-42010a8000e5": [
-        {
+      },
+      "71c2b4eb-2949-11e9-b356-42010a8000e5-8682460a-29b5-11e9-b356-42010a8000e5": {
+        "source": {
+          "node": "71c2b4eb-2949-11e9-b356-42010a8000e5",
+          "connector": "",
+          "connectorType": "name",
+          "edge": "explicit"
+        },
+        "destination": {
           "node": "8682460a-29b5-11e9-b356-42010a8000e5",
+          "connector": "",
+          "connectorType": "name",
           "edge": "explicit"
         }
-      ],
-      "8682460a-29b5-11e9-b356-42010a8000e5": [
-        {
+      },
+      "8682460a-29b5-11e9-b356-42010a8000e5-bf4800b5b6602c4c78ba3b654af02b3b": {
+        "source": {
+          "node": "8682460a-29b5-11e9-b356-42010a8000e5",
+          "connector": "",
+          "connectorType": "name",
+          "edge": "explicit"
+        },
+        "destination": {
           "node": "bf4800b5b6602c4c78ba3b654af02b3b",
+          "connector": "",
+          "connectorType": "name",
           "edge": "explicit"
         }
-      ]
+      }
     },
     "nodes": {
       "69e4ea11-2985-11e9-b356-42010a8000e5": {

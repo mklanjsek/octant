@@ -29,7 +29,7 @@ import (
 // ObjectHandler performs actions on an object. Can be used to augment
 // visitor actions with extra functionality.
 type ObjectHandler interface {
-	AddEdge(ctx context.Context, v1, v2 *unstructured.Unstructured) error
+	AddEdge(ctx context.Context, from, to EdgeDefinition) error
 	Process(ctx context.Context, object *unstructured.Unstructured) error
 }
 
@@ -48,6 +48,27 @@ type TypedVisitor interface {
 // its ancestors and descendants.
 type Visitor interface {
 	Visit(ctx context.Context, object *unstructured.Unstructured, handler ObjectHandler, visitDescendants bool) error
+}
+
+
+type ConnectorType string
+
+const (
+	// Edge connection type unknown
+	ConnectorTypeUnknown = "unknown"
+	// Edge connection type is defined as Name
+	ConnectorTypeName = "name"
+	// Edge connection type is defined as Label
+	ConnectorTypeLabel = "label"
+	// Edge connection type is defined as Selector
+	ConnectorTypeSelector = "selector"
+)
+
+// EdgeDefinition defines the edge.
+type EdgeDefinition struct {
+	Object    		*unstructured.Unstructured
+	Connector 		string
+	ConnectorType   ConnectorType
 }
 
 // DefaultVisitorOption is an option for configuring DefaultVisitor.

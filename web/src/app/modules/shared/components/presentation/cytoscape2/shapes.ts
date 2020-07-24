@@ -23,6 +23,7 @@ export abstract class Shape extends BaseShape {
   }
   overflowDirection = OverflowDirectionType.DOWN;
   classes: string;
+  textMeasureCanvas: any;
 
   element: any;
 
@@ -39,25 +40,31 @@ export abstract class Shape extends BaseShape {
   }
 
   nextPortPosition(shapes: Shape[], port: Port, preferred: number): number {
+    let nextPosition = preferred;
+
     if (this.ports.length === 0) {
       this.ports.push(port);
-      return preferred;
+    } else {
+      const existing = this.ports.indexOf(port);
+      if (existing >= 0) {
+        nextPosition = (this.ports[existing] as Port).currentPosition.y;
+      } else {
+        const total = this.ports.filter(
+          (shape: Port) =>
+            shape.parentId === this.id && shape.location === port.location
+        ).length;
+        this.ports.push(port);
+        nextPosition =
+          total > 0
+            ? preferred + (total * this.getHeight(shapes)) / 4
+            : preferred;
+      }
     }
-
-    if (this.ports.includes(port)) {
-      return port.getPosition(shapes).y;
-    }
-
-    const total = this.ports.filter(
-      (shape: Port) =>
-        shape.parentId === this.id && shape.location === port.location
-    ).length;
-    this.ports.push(port);
-    return total > 0 ? preferred + this.getHeight(shapes) / 3 : preferred;
+    return port.location === 'left' ? nextPosition : nextPosition + 32;
   }
 
   preferredPortPosition(shapes: Shape[]): number {
-    return this.preferredPosition(shapes).y - this.getHeight(shapes) / 10;
+    return this.getPosition(shapes).y - this.getHeight(shapes) / 10;
   }
 
   getPosition(shapes: Shape[]): { x: number; y: number } {
@@ -108,7 +115,7 @@ export abstract class Shape extends BaseShape {
   }
 
   getPortPosition(shapes: Shape[], port: Port): { x: number; y: number } {
-    const textWidth = this.getTextWidth(port.label) + 10;
+    const textWidth = this.getTextWidth(port.getLabel()) + 24;
     const { x } = this.getPosition(shapes);
     const portY = this.nextPortPosition(
       shapes,
@@ -133,23 +140,20 @@ export abstract class Shape extends BaseShape {
     return true;
   }
 
-  getTextWidth(txt) {
-    const fontName = 'Metropolis';
-    const fontSize = 14;
-    //    this.cytoscape.nodes('#glyph20')[0]._private.rstyle.labelWidth
+  private getLabel() {
+    return this.label.length > 40
+      ? this.label.substring(0, 40) + '...'
+      : this.label;
+  }
 
-    if (!this.element) {
-      this.element = document.createElement('span');
-      document.body.appendChild(this.element);
+  getTextWidth(txt) {
+    if (!this.textMeasureCanvas) {
+      this.textMeasureCanvas = document.createElement('canvas');
     }
-    if (this.element.style.fontSize !== fontSize) {
-      this.element.style.fontSize = fontSize;
-    }
-    if (this.element.style.fontFamily !== fontName) {
-      this.element.style.fontFamily = fontName;
-    }
-    this.element.innerText = txt;
-    return this.element.offsetWidth;
+    const context = this.textMeasureCanvas.getContext('2d');
+    context.font = '14px Metropolis';
+
+    return context.measureText(txt).width;
   }
 
   toNode(shapes: Shape[]) {
@@ -157,7 +161,7 @@ export abstract class Shape extends BaseShape {
     return {
       data: {
         id: this.id,
-        label: this.constructor.name === 'Port' ? this.label : '',
+        label: this.kind === 'Port' ? this.getLabel() : '',
         owner: this.parentId,
         width: this.getWidth(shapes),
         height: this.getHeight(shapes),
@@ -201,7 +205,7 @@ export class Deployment extends Shape {
   }
 
   preferredPortPosition(shapes: Shape[]): number {
-    return (2 * this.preferredPosition(shapes).y) / 3;
+    return (2 * this.getPosition(shapes).y) / 3;
   }
 
   getWidth(shapes: Shape[]): number {
@@ -721,6 +725,10 @@ export class Pod extends Shape {
     this.classes = 'pod status';
   }
 
+  preferredPortPosition(shapes: Shape[]): number {
+    return this.getPosition(shapes).y - this.getHeight(shapes) / 7;
+  }
+
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
     return { x: 875, y: 525 };
   }
@@ -739,6 +747,8 @@ export class Port extends Shape {
     this.classes = className;
   }
 
+  currentPosition: { x: number; y: number };
+
   isMovable(): boolean {
     return false;
   }
@@ -754,7 +764,7 @@ export class Port extends Shape {
   getPosition(shapes: Shape[]): { x: number; y: number } {
     const parentNode = this.getParent(shapes);
     const portPosition = parentNode.getPortPosition(shapes, this);
-
+    this.currentPosition = portPosition;
     return portPosition;
   }
 }
