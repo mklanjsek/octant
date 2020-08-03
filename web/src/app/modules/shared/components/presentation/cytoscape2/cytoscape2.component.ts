@@ -74,7 +74,11 @@ export class Cytoscape2Component implements OnChanges, OnInit {
   }
 
   ngOnInit(): void {
-    if(this.cytoscape && this.cytoscape.nodes() && this.cytoscape.nodes().first()) {
+    if (
+      this.cytoscape &&
+      this.cytoscape.nodes() &&
+      this.cytoscape.nodes().first()
+    ) {
       this.select.emit(this.cytoscape.nodes().first().data());
     }
   }
@@ -124,7 +128,12 @@ export class Cytoscape2Component implements OnChanges, OnInit {
         this.cytoscape
           .nodes()
           .forEach(node => positionChildren(this.cytoscape, node));
-        if (this.cytoscape.nodes().length > 1) {
+
+        const firstNode = this.cytoscape.nodes().first();
+        this.cytoscape.nodes().unselect();
+        firstNode.select();
+
+        if (this.cytoscape.nodes().length > 3) {
           this.cytoscape.fit(undefined, 50);
         } else {
           this.cytoscape.fit(undefined, 150);
@@ -144,6 +153,8 @@ export class Cytoscape2Component implements OnChanges, OnInit {
       const node: NodeSingular = e.target;
       layoutChildren(this.cytoscape, node);
       localSelect.emit(node.data());
+      this.cytoscape.nodes().unselect();
+      node.select();
       this.moveStarted = false;
     });
   }

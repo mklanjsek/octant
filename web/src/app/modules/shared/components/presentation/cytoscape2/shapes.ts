@@ -209,7 +209,7 @@ export class Deployment extends Shape {
   }
 
   getWidth(shapes: Shape[]): number {
-    const replicas = this.totalReplicas(shapes);
+    const replicas = Math.max(1, this.totalReplicas(shapes));
     return this.preferedWidth + (replicas - 1) * (this.preferedWidth - 100);
   }
 

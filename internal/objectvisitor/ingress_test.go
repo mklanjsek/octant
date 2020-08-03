@@ -29,8 +29,8 @@ func TestIngress_Visit(t *testing.T) {
 
 	handler := fake.NewMockObjectHandler(controller)
 	handler.EXPECT().
-		AddEdge(gomock.Any(), objectvisitor.EdgeDefinition{Object: u, Connector: "", ConnectorType: objectvisitor.ConnectorTypeUnknown},
-			objectvisitor.EdgeDefinition{Object: testutil.ToUnstructured(t, service), Connector: "", ConnectorType: objectvisitor.ConnectorTypeUnknown}).
+		AddEdge(gomock.Any(), objectvisitor.EdgeDefinition{Object: u, Connector: "paths.backend.serviceName: service", ConnectorType: objectvisitor.ConnectorTypeName},
+			objectvisitor.EdgeDefinition{Object: testutil.ToUnstructured(t, service), Connector: "name: service", ConnectorType: objectvisitor.ConnectorTypeName}).
 		Return(nil)
 
 	var visited []unstructured.Unstructured

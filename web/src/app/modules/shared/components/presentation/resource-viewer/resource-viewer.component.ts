@@ -89,16 +89,20 @@ export class ResourceViewerComponent implements OnChanges, AfterViewInit {
   }
 
   generateGraphData(): ElementsDefinition {
-    return ShapeUtils.loadShapes(this.currentView.config);
+    if (this.currentView.config) {
+      // console.log('data', JSON.stringify(this.currentView.config));
+      return ShapeUtils.loadShapes(this.currentView.config);
+    }
   }
 
   private select(id: string) {
-    this.selected = id;
+    if (id) {
+      this.selected = id;
+      const nodes = this.currentView.config.nodes;
 
-    const nodes = this.currentView.config.nodes;
-
-    if (nodes && nodes[id]) {
-      this.selectedNode = nodes[id];
+      if (nodes && nodes[id]) {
+        this.selectedNode = nodes[id];
+      }
     }
   }
 }

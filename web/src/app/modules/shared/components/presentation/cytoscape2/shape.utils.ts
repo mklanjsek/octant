@@ -105,47 +105,44 @@ export abstract class ShapeUtils {
   static createEdges(shapes: BaseShape[], edges: BackendEdgesDef) {
     if (edges) {
       Object.entries(edges).map(([key, value]) => {
-        const sourceId = value.source.node;
-        const targetId = value.destination.node;
+        if (value.source && value.destination) {
+          const sourceId = value.source.node;
+          const targetId = value.destination.node;
 
-        const sourceShape: BaseShape = ShapeUtils.findById(shapes, sourceId)[0];
-        const targetShape: BaseShape = ShapeUtils.findById(shapes, targetId)[0];
+          const src: BaseShape = ShapeUtils.findById(shapes, sourceId)[0];
+          const trg: BaseShape = ShapeUtils.findById(shapes, targetId)[0];
 
-        if (
-          sourceShape &&
-          targetShape &&
-          sourceShape.kind !== targetShape.kind
-        ) {
-          const { edge, firsPosition, secondPosition } = ShapeUtils.verifyEdge(
-            shapes,
-            value,
-            sourceShape,
-            targetShape
-          );
-          const sourcePort = ShapeUtils.addPort(
-            shapes,
-            edge.source,
-            firsPosition
-          );
-          const targetPort = ShapeUtils.addPort(
-            shapes,
-            edge.destination,
-            secondPosition
-          );
-          const source =
-            sourcePort && sourcePort.length > 0 ? sourcePort : sourceId;
-          const target =
-            targetPort && targetPort.length > 0 ? targetPort : targetId;
-          const edgeClass =
-            sourcePort.length > 0 || targetPort.length > 0 ? 'unbundled' : '';
+          if (src && trg && src.kind !== trg.kind) {
+            const {
+              edge,
+              firsPosition,
+              secondPosition,
+            } = ShapeUtils.verifyEdge(shapes, value, src, trg);
+            const sourcePort = ShapeUtils.addPort(
+              shapes,
+              edge.source,
+              firsPosition
+            );
+            const targetPort = ShapeUtils.addPort(
+              shapes,
+              edge.destination,
+              secondPosition
+            );
+            const source =
+              sourcePort && sourcePort.length > 0 ? sourcePort : sourceId;
+            const target =
+              targetPort && targetPort.length > 0 ? targetPort : targetId;
+            const edgeClass =
+              sourcePort.length > 0 || targetPort.length > 0 ? 'unbundled' : '';
 
-          const nEdge = new Edge(
-            `${source}-${target}`,
-            target,
-            source,
-            edgeClass
-          );
-          shapes.push(nEdge);
+            const nEdge = new Edge(
+              `${source}-${target}`,
+              target,
+              source,
+              edgeClass
+            );
+            shapes.push(nEdge);
+          }
         }
       });
     }
@@ -157,8 +154,27 @@ export abstract class ShapeUtils {
     sourceShape: BaseShape,
     targetShape: BaseShape
   ): { edge: any; firsPosition: string; secondPosition: string } {
-    // const flow= sourceShape.kind + targetShape.kind;
-    return { edge, firsPosition: 'left', secondPosition: 'right' };
+    const flow = sourceShape.kind + '-' + targetShape.kind;
+    const firstPosition = 'left';
+    const secondPosition = 'right';
+    let swap = false;
+
+    switch (flow) {
+      case 'Service-Pod':
+      case 'Ingress-Service':
+      case 'ServiceAccount-Pod':
+      case 'ConfigMap-Pod':
+      case 'Secret-ServiceAccount':
+        //      case 'HorizontalPodAutoscaler-Deployment'
+        //      case 'HorizontalPodAutoscaler-ReplicaSet'
+        //      case 'HorizontalPodAutoscaler-ReplicationController'
+        swap = true;
+        break;
+    }
+    if (swap) {
+      edge = { source: edge.destination, destination: edge.source };
+    }
+    return { edge, firsPosition: firstPosition, secondPosition };
   }
 
   static addPort(
@@ -166,18 +182,21 @@ export abstract class ShapeUtils {
     edge: BackendSingleEdgeDef,
     location: string
   ): string {
-    const id = `port ${edge.node}-${edge.connector}`;
-    const className =
-      edge.connectorType === 'selector' || edge.connectorType === 'label'
-        ? edge.connectorType
-        : 'port';
+    if (edge.connectorType !== 'unknown') {
+      const id = `port ${edge.node}-${edge.connector}`;
+      const className =
+        edge.connectorType === 'selector' || edge.connectorType === 'label'
+          ? edge.connectorType
+          : 'port';
 
-    if (ShapeUtils.findById(shapes, id).length === 0) {
-      shapes.push(
-        new Port(id, 'ok', edge.connector, location, className, edge.node)
-      );
+      if (ShapeUtils.findById(shapes, id).length === 0) {
+        shapes.push(
+          new Port(id, 'ok', edge.connector, location, className, edge.node)
+        );
+      }
+      return id;
     }
-    return id;
+    return '';
   }
 
   static fromDataStream(id: string, data: any): BaseShape {

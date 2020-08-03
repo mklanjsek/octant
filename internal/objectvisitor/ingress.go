@@ -2,6 +2,7 @@ package objectvisitor
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/pkg/errors"
 	"go.opencensus.io/trace"
@@ -56,8 +57,8 @@ func (i *Ingress) Visit(ctx context.Context, object *unstructured.Unstructured, 
 				return errors.Wrapf(err, "ingress %s visit service %s",
 					kubernetes.PrintObject(ingress), kubernetes.PrintObject(service))
 			}
-			source:= EdgeDefinition{object, "", ConnectorTypeUnknown}
-			target:= EdgeDefinition{service, "", ConnectorTypeUnknown}
+			source:= EdgeDefinition{object, fmt.Sprintf("paths.backend.serviceName: %s", service.GetName()), ConnectorTypeName}
+			target:= EdgeDefinition{service, fmt.Sprintf("name: %s", service.GetName()), ConnectorTypeName}
 			return handler.AddEdge(ctx, source, target)
 		})
 
