@@ -117,6 +117,13 @@ export const ELEMENTS_STYLE: Stylesheet[] = [
     },
   },
   {
+    selector: '.unknown',
+    css: {
+      'border-width': '1px',
+      'shape-polygon-points': polygonPoints(-0.55),
+    },
+  },
+  {
     selector: '.secret',
     css: {},
   },

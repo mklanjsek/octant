@@ -1,5 +1,6 @@
 import {storiesOf} from '@storybook/angular';
 import {
+  REAL_DATA_CRDS,
   REAL_DATA_DAEMON_SET, REAL_DATA_DAEMON_SET2,
   REAL_DATA_DEPLOYMENT, REAL_DATA_INGRESS, REAL_DATA_JOB,
   REAL_DATA_STATEFUL_SET, REAL_DATA_TWO_REPLICAS, REAL_DATA_TWO_SECRETS,
@@ -78,6 +79,7 @@ const testCases= [{title:'Deployment', data: REAL_DATA_DEPLOYMENT},
  {title:'two Secrets', data: REAL_DATA_TWO_SECRETS},
  {title:'Job', data: REAL_DATA_JOB},
  {title:'Ingress', data: REAL_DATA_INGRESS},
+ {title:'Custom Resources', data: REAL_DATA_CRDS},
 ];
 
 testCases.map(story =>

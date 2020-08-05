@@ -184,6 +184,26 @@ export abstract class Shape extends BaseShape {
   protected getParent(shapes: Shape[]) {
     return shapes.find((shape: Shape) => shape.id === this.parentId);
   }
+
+  findByClass(shapes: Shape[], cl: string): Shape[] {
+    return shapes
+      .filter(shape => shape && shape.classes === cl)
+      .sort((first: Shape, second: Shape) => {
+        // sort by number of connections
+        const firstConnections = shapes.filter(
+          (shape: any) =>
+            shape.kind === 'Edge' &&
+            (shape.sourceId === first.id || shape.targetId === first.id)
+        ).length;
+        const secondConnections = shapes.filter(
+          (shape: any) =>
+            shape.kind === 'Edge' &&
+            (shape.sourceId === second.id || shape.targetId === second.id)
+        ).length;
+
+        return secondConnections - firstConnections;
+      });
+  }
 }
 
 export class Deployment extends Shape {
@@ -676,23 +696,29 @@ export class Unknown extends Shape {
     status: string,
     label: string,
     hasChildren: boolean,
+    kind?: string,
     parentId?: string
   ) {
-    super(
-      id,
-      status,
-      'Unknown',
-      `Unknown resource: ${label}`,
-      350,
-      200,
-      hasChildren,
-      parentId
-    );
-    this.classes = 'unknown';
+    super(id, status, kind, label, 450, 250, hasChildren, parentId);
+    this.classes = 'unknown status';
   }
 
   preferredPosition(shapes: Shape[]): { x: number; y: number } {
-    return { x: 0, y: 0 };
+    const unknowns = this.findByClass(shapes, 'unknown status');
+    const total = unknowns.length;
+    const index = unknowns.findIndex(shape => shape.id === this.id);
+    const location =
+      index === 0
+        ? { x: 550, y: 200 }
+        : {
+            x:
+              index < total / 2
+                ? 550 * index + 250
+                : 550 * (index - total / 2 + 1) + 400,
+            y: index < total / 2 ? 700 : 1200,
+          };
+
+    return location;
   }
 }
 

@@ -1428,3 +1428,596 @@ export const REAL_DATA_INGRESS: NodeDataDef = {
   },
 };
 
+export const REAL_DATA_CRDS: NodeDataDef = {
+  "edges": {
+    "16771a1b-5620-4086-ad37-0446c14904a8-35129712-a86a-47e8-9128-b7196dfa7032": {
+      "source": {
+        "node": "16771a1b-5620-4086-ad37-0446c14904a8",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      },
+      "destination": {
+        "node": "35129712-a86a-47e8-9128-b7196dfa7032",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      }
+    },
+    "16771a1b-5620-4086-ad37-0446c14904a8-da7ee8c2-c869-44fa-9723-aee422d92986": {
+      "source": {
+        "node": "da7ee8c2-c869-44fa-9723-aee422d92986",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      },
+      "destination": {
+        "node": "16771a1b-5620-4086-ad37-0446c14904a8",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      }
+    },
+    "2a720370-6289-4be0-a711-4912ba1212d8-9c00e060-fbcb-47e5-8722-c78a8adc3ffa": {
+      "source": {
+        "node": "9c00e060-fbcb-47e5-8722-c78a8adc3ffa",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      },
+      "destination": {
+        "node": "2a720370-6289-4be0-a711-4912ba1212d8",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      }
+    },
+    "9979ec07-27b4-44b5-b2a8-17a225516fa4-da7ee8c2-c869-44fa-9723-aee422d92986": {
+      "source": {
+        "node": "da7ee8c2-c869-44fa-9723-aee422d92986",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      },
+      "destination": {
+        "node": "9979ec07-27b4-44b5-b2a8-17a225516fa4",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      }
+    },
+    "9c00e060-fbcb-47e5-8722-c78a8adc3ffa-16771a1b-5620-4086-ad37-0446c14904a8": {
+      "source": {
+        "node": "16771a1b-5620-4086-ad37-0446c14904a8",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      },
+      "destination": {
+        "node": "9c00e060-fbcb-47e5-8722-c78a8adc3ffa",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      }
+    },
+    "9c00e060-fbcb-47e5-8722-c78a8adc3ffa-4fb08940-a61e-481c-957b-02482e200796": {
+      "source": {
+        "node": "9c00e060-fbcb-47e5-8722-c78a8adc3ffa",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      },
+      "destination": {
+        "node": "4fb08940-a61e-481c-957b-02482e200796",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      }
+    },
+    "9c00e060-fbcb-47e5-8722-c78a8adc3ffa-52194142-6aef-41b2-be2b-0ad0ecb18fcd": {
+      "source": {
+        "node": "9c00e060-fbcb-47e5-8722-c78a8adc3ffa",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      },
+      "destination": {
+        "node": "52194142-6aef-41b2-be2b-0ad0ecb18fcd",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      }
+    },
+    "9c00e060-fbcb-47e5-8722-c78a8adc3ffa-9979ec07-27b4-44b5-b2a8-17a225516fa4": {
+      "source": {
+        "node": "9979ec07-27b4-44b5-b2a8-17a225516fa4",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      },
+      "destination": {
+        "node": "9c00e060-fbcb-47e5-8722-c78a8adc3ffa",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      }
+    },
+    "9c00e060-fbcb-47e5-8722-c78a8adc3ffa-9fcb7c82-677d-414e-9294-e3b14724796b": {
+      "source": {
+        "node": "9c00e060-fbcb-47e5-8722-c78a8adc3ffa",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      },
+      "destination": {
+        "node": "9fcb7c82-677d-414e-9294-e3b14724796b",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      }
+    },
+    "9c00e060-fbcb-47e5-8722-c78a8adc3ffa-cd91e9c2-cfe5-4810-bd49-ffca80f4cabe": {
+      "source": {
+        "node": "9c00e060-fbcb-47e5-8722-c78a8adc3ffa",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      },
+      "destination": {
+        "node": "cd91e9c2-cfe5-4810-bd49-ffca80f4cabe",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      }
+    },
+    "9c00e060-fbcb-47e5-8722-c78a8adc3ffa-da7ee8c2-c869-44fa-9723-aee422d92986": {
+      "source": {
+        "node": "9c00e060-fbcb-47e5-8722-c78a8adc3ffa",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      },
+      "destination": {
+        "node": "da7ee8c2-c869-44fa-9723-aee422d92986",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      }
+    },
+    "9c00e060-fbcb-47e5-8722-c78a8adc3ffa-dfa02c83-cbc0-4fad-923c-bd056bd92a69": {
+      "source": {
+        "node": "9c00e060-fbcb-47e5-8722-c78a8adc3ffa",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      },
+      "destination": {
+        "node": "dfa02c83-cbc0-4fad-923c-bd056bd92a69",
+        "connector": "",
+        "connectorType": "unknown",
+        "edge": "explicit"
+      }
+    }
+  },
+  "nodes": {
+    "16771a1b-5620-4086-ad37-0446c14904a8": {
+      "name": "tkg-cluster-wc-355-control-plane-sk4d6",
+      "apiVersion": "bootstrap.cluster.x-k8s.io/v1alpha3",
+      "kind": "KubeadmConfig",
+      "status": "ok",
+      "details": [
+        {
+          "metadata": {
+            "type": "text"
+          },
+          "config": {
+            "value": "bootstrap.cluster.x-k8s.io/v1alpha3 KubeadmConfig is OK"
+          }
+        }
+      ],
+      "path": {
+        "metadata": {
+          "type": "link",
+          "title": [
+            {
+              "metadata": {
+                "type": "text"
+              },
+              "config": {
+                "value": ""
+              }
+            }
+          ]
+        },
+        "config": {
+          "value": "tkg-cluster-wc-355-control-plane-sk4d6",
+          "ref": "/overview/namespace/default/custom-resources/kubeadmconfigs.bootstrap.cluster.x-k8s.io/v1alpha3/tkg-cluster-wc-355-control-plane-sk4d6"
+        }
+      },
+      "hasChildren": false,
+      "namespace": "default",
+      "created": 1596478117
+    },
+    "2a720370-6289-4be0-a711-4912ba1212d8": {
+      "name": "tkg-cluster-wc-355",
+      "apiVersion": "cluster.x-k8s.io/v1alpha3",
+      "kind": "Cluster",
+      "status": "ok",
+      "details": [
+        {
+          "metadata": {
+            "type": "text"
+          },
+          "config": {
+            "value": "cluster.x-k8s.io/v1alpha3 Cluster is OK"
+          }
+        }
+      ],
+      "path": {
+        "metadata": {
+          "type": "link",
+          "title": [
+            {
+              "metadata": {
+                "type": "text"
+              },
+              "config": {
+                "value": ""
+              }
+            }
+          ]
+        },
+        "config": {
+          "value": "tkg-cluster-wc-355",
+          "ref": "/overview/namespace/default/custom-resources/clusters.cluster.x-k8s.io/v1alpha3/tkg-cluster-wc-355"
+        }
+      },
+      "hasChildren": false,
+      "namespace": "default",
+      "created": 1596477895
+    },
+    "35129712-a86a-47e8-9128-b7196dfa7032": {
+      "name": "tkg-cluster-wc-355-control-plane-sk4d6",
+      "apiVersion": "v1",
+      "kind": "Secret",
+      "status": "ok",
+      "details": [
+        {
+          "metadata": {
+            "type": "text"
+          },
+          "config": {
+            "value": "v1 Secret is OK"
+          }
+        }
+      ],
+      "path": {
+        "metadata": {
+          "type": "link",
+          "title": [
+            {
+              "metadata": {
+                "type": "text"
+              },
+              "config": {
+                "value": ""
+              }
+            }
+          ]
+        },
+        "config": {
+          "value": "tkg-cluster-wc-355-control-plane-sk4d6",
+          "ref": "/overview/namespace/default/config-and-storage/secrets/tkg-cluster-wc-355-control-plane-sk4d6"
+        }
+      },
+      "hasChildren": false,
+      "namespace": "default",
+      "created": 1596478118
+    },
+    "4fb08940-a61e-481c-957b-02482e200796": {
+      "name": "tkg-cluster-wc-355-etcd",
+      "apiVersion": "v1",
+      "kind": "Secret",
+      "status": "ok",
+      "details": [
+        {
+          "metadata": {
+            "type": "text"
+          },
+          "config": {
+            "value": "v1 Secret is OK"
+          }
+        }
+      ],
+      "path": {
+        "metadata": {
+          "type": "link",
+          "title": [
+            {
+              "metadata": {
+                "type": "text"
+              },
+              "config": {
+                "value": ""
+              }
+            }
+          ]
+        },
+        "config": {
+          "value": "tkg-cluster-wc-355-etcd",
+          "ref": "/overview/namespace/default/config-and-storage/secrets/tkg-cluster-wc-355-etcd"
+        }
+      },
+      "hasChildren": false,
+      "namespace": "default",
+      "created": 1596478117
+    },
+    "52194142-6aef-41b2-be2b-0ad0ecb18fcd": {
+      "name": "tkg-cluster-wc-355-ca",
+      "apiVersion": "v1",
+      "kind": "Secret",
+      "status": "ok",
+      "details": [
+        {
+          "metadata": {
+            "type": "text"
+          },
+          "config": {
+            "value": "v1 Secret is OK"
+          }
+        }
+      ],
+      "path": {
+        "metadata": {
+          "type": "link",
+          "title": [
+            {
+              "metadata": {
+                "type": "text"
+              },
+              "config": {
+                "value": ""
+              }
+            }
+          ]
+        },
+        "config": {
+          "value": "tkg-cluster-wc-355-ca",
+          "ref": "/overview/namespace/default/config-and-storage/secrets/tkg-cluster-wc-355-ca"
+        }
+      },
+      "hasChildren": false,
+      "namespace": "default",
+      "created": 1596478117
+    },
+    "9979ec07-27b4-44b5-b2a8-17a225516fa4": {
+      "name": "tkg-cluster-wc-355-control-plane-xm5pl",
+      "apiVersion": "infrastructure.cluster.x-k8s.io/v1alpha3",
+      "kind": "VSphereMachine",
+      "status": "ok",
+      "details": [
+        {
+          "metadata": {
+            "type": "text"
+          },
+          "config": {
+            "value": "infrastructure.cluster.x-k8s.io/v1alpha3 VSphereMachine is OK"
+          }
+        }
+      ],
+      "path": {
+        "metadata": {
+          "type": "link",
+          "title": [
+            {
+              "metadata": {
+                "type": "text"
+              },
+              "config": {
+                "value": ""
+              }
+            }
+          ]
+        },
+        "config": {
+          "value": "tkg-cluster-wc-355-control-plane-xm5pl",
+          "ref": "/overview/namespace/default/custom-resources/vspheremachines.infrastructure.cluster.x-k8s.io/v1alpha3/tkg-cluster-wc-355-control-plane-xm5pl"
+        }
+      },
+      "hasChildren": false,
+      "namespace": "default",
+      "created": 1596478117
+    },
+    "9c00e060-fbcb-47e5-8722-c78a8adc3ffa": {
+      "name": "tkg-cluster-wc-355-control-plane",
+      "apiVersion": "controlplane.cluster.x-k8s.io/v1alpha3",
+      "kind": "KubeadmControlPlane",
+      "status": "ok",
+      "details": [
+        {
+          "metadata": {
+            "type": "text"
+          },
+          "config": {
+            "value": "controlplane.cluster.x-k8s.io/v1alpha3 KubeadmControlPlane is OK"
+          }
+        }
+      ],
+      "path": {
+        "metadata": {
+          "type": "link",
+          "title": [
+            {
+              "metadata": {
+                "type": "text"
+              },
+              "config": {
+                "value": ""
+              }
+            }
+          ]
+        },
+        "config": {
+          "value": "tkg-cluster-wc-355-control-plane",
+          "ref": "/overview/namespace/default/custom-resources/kubeadmcontrolplanes.controlplane.cluster.x-k8s.io/v1alpha3/tkg-cluster-wc-355-control-plane"
+        }
+      },
+      "hasChildren": false,
+      "namespace": "default",
+      "created": 1596477896
+    },
+    "9fcb7c82-677d-414e-9294-e3b14724796b": {
+      "name": "tkg-cluster-wc-355-proxy",
+      "apiVersion": "v1",
+      "kind": "Secret",
+      "status": "ok",
+      "details": [
+        {
+          "metadata": {
+            "type": "text"
+          },
+          "config": {
+            "value": "v1 Secret is OK"
+          }
+        }
+      ],
+      "path": {
+        "metadata": {
+          "type": "link",
+          "title": [
+            {
+              "metadata": {
+                "type": "text"
+              },
+              "config": {
+                "value": ""
+              }
+            }
+          ]
+        },
+        "config": {
+          "value": "tkg-cluster-wc-355-proxy",
+          "ref": "/overview/namespace/default/config-and-storage/secrets/tkg-cluster-wc-355-proxy"
+        }
+      },
+      "hasChildren": false,
+      "namespace": "default",
+      "created": 1596478117
+    },
+    "cd91e9c2-cfe5-4810-bd49-ffca80f4cabe": {
+      "name": "tkg-cluster-wc-355-kubeconfig",
+      "apiVersion": "v1",
+      "kind": "Secret",
+      "status": "ok",
+      "details": [
+        {
+          "metadata": {
+            "type": "text"
+          },
+          "config": {
+            "value": "v1 Secret is OK"
+          }
+        }
+      ],
+      "path": {
+        "metadata": {
+          "type": "link",
+          "title": [
+            {
+              "metadata": {
+                "type": "text"
+              },
+              "config": {
+                "value": ""
+              }
+            }
+          ]
+        },
+        "config": {
+          "value": "tkg-cluster-wc-355-kubeconfig",
+          "ref": "/overview/namespace/default/config-and-storage/secrets/tkg-cluster-wc-355-kubeconfig"
+        }
+      },
+      "hasChildren": false,
+      "namespace": "default",
+      "created": 1596478117
+    },
+    "da7ee8c2-c869-44fa-9723-aee422d92986": {
+      "name": "tkg-cluster-wc-355-control-plane-t87v5",
+      "apiVersion": "cluster.x-k8s.io/v1alpha3",
+      "kind": "Machine",
+      "status": "ok",
+      "details": [
+        {
+          "metadata": {
+            "type": "text"
+          },
+          "config": {
+            "value": "cluster.x-k8s.io/v1alpha3 Machine is OK"
+          }
+        }
+      ],
+      "path": {
+        "metadata": {
+          "type": "link",
+          "title": [
+            {
+              "metadata": {
+                "type": "text"
+              },
+              "config": {
+                "value": ""
+              }
+            }
+          ]
+        },
+        "config": {
+          "value": "tkg-cluster-wc-355-control-plane-t87v5",
+          "ref": "/overview/namespace/default/custom-resources/machines.cluster.x-k8s.io/v1alpha3/tkg-cluster-wc-355-control-plane-t87v5"
+        }
+      },
+      "hasChildren": false,
+      "namespace": "default",
+      "created": 1596478118
+    },
+    "dfa02c83-cbc0-4fad-923c-bd056bd92a69": {
+      "name": "tkg-cluster-wc-355-sa",
+      "apiVersion": "v1",
+      "kind": "Secret",
+      "status": "ok",
+      "details": [
+        {
+          "metadata": {
+            "type": "text"
+          },
+          "config": {
+            "value": "v1 Secret is OK"
+          }
+        }
+      ],
+      "path": {
+        "metadata": {
+          "type": "link",
+          "title": [
+            {
+              "metadata": {
+                "type": "text"
+              },
+              "config": {
+                "value": ""
+              }
+            }
+          ]
+        },
+        "config": {
+          "value": "tkg-cluster-wc-355-sa",
+          "ref": "/overview/namespace/default/config-and-storage/secrets/tkg-cluster-wc-355-sa"
+        }
+      },
+      "hasChildren": false,
+      "namespace": "default",
+      "created": 1596478117
+    }
+  }
+}
+

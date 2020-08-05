@@ -413,8 +413,9 @@ export abstract class ShapeUtils {
         return new Unknown(
           id,
           data.status,
-          data.kind,
+          ShapeUtils.getLabel(data),
           data.hasChildren,
+          data.kind,
           data.parentId
         );
     }
