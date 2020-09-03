@@ -233,7 +233,7 @@ export interface QuadrantView extends View {
   };
 }
 
-export interface Edge {
+export interface EdgeDef {
   node: string;
   edge: string;
 }
@@ -249,10 +249,29 @@ export interface Node {
 
 export interface ResourceViewerView extends View {
   config: {
-    edges: { [key: string]: Edge[] };
+    edges: { [key: string]: EdgeDef[] };
     nodes: Node[];
     selected: string;
   };
+}
+
+export interface BackendSingleEdgeDef {
+  node: string;
+  edge: string;
+  connector: string;
+  connectorType: string;
+}
+
+export interface BackendEdgeDef {
+  source: BackendSingleEdgeDef;
+  destination: BackendSingleEdgeDef;
+}
+
+export type BackendEdgesDef = Record<string, BackendEdgeDef>;
+
+export interface ResourceViewerData extends View {
+    edges: Record<string, BackendEdgeDef>;
+    nodes: Node[];
 }
 
 export interface SelectorsView extends View {

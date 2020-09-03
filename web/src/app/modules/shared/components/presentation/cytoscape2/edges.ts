@@ -1,4 +1,5 @@
 import { BaseShape } from './base.shape';
+import { ElementDefinition } from 'cytoscape';
 
 export class Edge extends BaseShape {
   constructor(
@@ -10,7 +11,7 @@ export class Edge extends BaseShape {
     super(id, 'Edge');
   }
 
-  toNode(shapes: BaseShape[]) {
+  toNode(shapes: BaseShape[]): ElementDefinition {
     return {
       data: {
         id: this.id,
@@ -18,12 +19,10 @@ export class Edge extends BaseShape {
         target: this.targetId,
       },
       group: 'edges',
-      removed: false,
       selected: false,
       selectable: true,
       locked: false,
       grabbable: true,
-      pannable: false,
       classes: this.classes,
     };
   }

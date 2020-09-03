@@ -16,18 +16,25 @@ import {
   ViewChild,
 } from '@angular/core';
 
-import cytoscape, { NodeSingular, SingularData, Stylesheet } from 'cytoscape';
+import cytoscape, { BaseLayoutOptions, NodeSingular, SingularData, Stylesheet } from 'cytoscape';
 import {
   hideChildren,
-  positionChildren,
-  layoutChildren,
+  layoutChildren
 } from './octant.layout';
 import coseBilkent from 'cytoscape-cose-bilkent';
 import octant from './octant.layout';
 import { ELEMENTS_STYLE } from './octant.style';
+import spread from 'cytoscape-spread';
+import { ShapeUtils } from './shape.utils';
+import { ResourceViewerData } from '../../../models/content';
+import { BaseShape } from './base.shape';
+import { Shape } from './shapes';
 
 cytoscape.use(coseBilkent);
 cytoscape('layout', 'octant', octant);
+
+cytoscape.use(spread);
+spread( cytoscape );
 
 @Component({
   selector: 'app-cytoscape2',
@@ -48,12 +55,15 @@ cytoscape('layout', 'octant', octant);
 })
 export class Cytoscape2Component implements OnChanges, OnInit {
   @ViewChild('cy', { static: true }) private cy: ElementRef;
-  @Input() public elements: any;
+  @Input() public elements: ResourceViewerData;
   @Input() public layout: any;
   @Input() public zoom: any;
   @Output() select: EventEmitter<any> = new EventEmitter<any>();
   @Output() doubleClick: EventEmitter<any> = new EventEmitter<any>();
 
+  headers: any= [];
+  nodes: BaseShape[] = [];
+  complexLayout: boolean = false;
   cytoscape: cytoscape.Core;
   style: Stylesheet[] = ELEMENTS_STYLE;
   applied = false;
@@ -85,6 +95,20 @@ export class Cytoscape2Component implements OnChanges, OnInit {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.elements && changes.elements.currentValue) {
+
+      this.nodes = Object.entries(this.elements.nodes).map(([key, value]) =>
+        ShapeUtils.fromDataStream(key, value)
+      );
+      this.complexLayout= this.nodes.length >= 11;
+      if (this.elements.edges) {
+        ShapeUtils.createEdges(this.nodes, this.elements.edges, !this.complexLayout, this.complexLayout);
+      }
+
+      this.nodes.sort(
+        (a: BaseShape, b: BaseShape) =>
+          ShapeUtils.shapeOrder(a.kind) - ShapeUtils.shapeOrder(b.kind)
+      );
+
       if (this.cytoscape) {
         this.applied = false;
         this.cytoscape.nodes('[?hasChildren]').forEach(node => {
@@ -105,7 +129,7 @@ export class Cytoscape2Component implements OnChanges, OnInit {
       minZoom: this.zoom.min,
       maxZoom: this.zoom.max,
       style: this.style,
-      elements: this.elements,
+      elements: this.nodes.map(shape => shape && shape.toNode(this.nodes)),
     };
     this.cytoscape = cytoscape(options);
 
@@ -123,23 +147,53 @@ export class Cytoscape2Component implements OnChanges, OnInit {
     });
 
     this.cytoscape.on('layoutstop', e => {
-      if (!this.applied) {
+      let done: boolean = false;
+      if (e.layout.options.name === 'cose-bilkent' && !this.applied) {
+        if(this.complexLayout) {
+          const layoutSpread = this.cytoscape.nodes().layout({
+            name: 'spread', fit: true, prelayout: { name: 'octant' }, animate: true,
+            expandingFactor: 0.2,
+            maxExpandIterations: 10,
+            minDist: 750, padding: 20
+          } as BaseLayoutOptions);
+          layoutSpread.run();
+        } else {
+          const headers= ShapeUtils.addHeaderNodes(this.nodes, this.cytoscape.nodes());
+          this.cytoscape.add(headers);
+          const finalLayout = this.cytoscape.nodes().layout({ name: 'octant' })
+          finalLayout.run();
+          this.cytoscape
+            .nodes()
+            .forEach(node => {
+              layoutChildren(this.cytoscape, node);
+            });
+          done = true;
+        }
+      }
+      else if (e.layout.options.name === 'spread' && !this.applied) {
         this.applied = true;
-        this.cytoscape
-          .nodes()
-          .forEach(node => positionChildren(this.cytoscape, node));
+        this.nodes.filter((node: Shape) => node.hasChildren).forEach(shape => {
+          const cyNode=this.cytoscape.nodes(`[id = '${shape.id}']`)[0];
+          layoutChildren(this.cytoscape, cyNode);
+        });
+        ShapeUtils.consolidatePosition(this.nodes, this.cytoscape.nodes());
+        const headers= ShapeUtils.addHeaderNodes(this.nodes, this.cytoscape.nodes());
+        this.cytoscape.add(headers);
 
+        this.cytoscape
+          .nodes('.header')
+          .forEach(node => {
+            node.style('visibility', 'visible');
+          });
+        this.cytoscape.fit(undefined, 20);
+        done = true;
+      }
+      if(done) {
         const firstNode = this.cytoscape.nodes().first();
         this.cytoscape.nodes().unselect();
         firstNode.select();
-
-        if (this.cytoscape.nodes().length > 3) {
-          this.cytoscape.fit(undefined, 50);
-        } else {
-          this.cytoscape.fit(undefined, 150);
-        }
       }
-    });
+      });
 
     this.cytoscape.on('drag', 'node', e => {
       const node: NodeSingular = e.target;

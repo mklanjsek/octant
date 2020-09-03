@@ -1,4 +1,5 @@
 import { BaseShape } from './base.shape';
+import { ElementDefinition } from 'cytoscape';
 
 enum OverflowDirectionType {
   DOWN,
@@ -29,17 +30,17 @@ export abstract class Shape extends BaseShape {
 
   ports: Shape[] = [];
 
-  abstract preferredPosition(shapes: Shape[]): { x: number; y: number };
+  abstract preferredPosition(shapes: BaseShape[]): { x: number; y: number };
 
-  getWidth(shapes: Shape[]): number {
+  getWidth(shapes: BaseShape[]): number {
     return this.preferedWidth;
   }
 
-  getHeight(shapes: Shape[]): number {
+  getHeight(shapes: BaseShape[]): number {
     return this.preferedHeight;
   }
 
-  nextPortPosition(shapes: Shape[], port: Port, preferred: number): number {
+  nextPortPosition(shapes: BaseShape[], port: Port, preferred: number): number {
     let nextPosition = preferred;
 
     if (this.ports.length === 0) {
@@ -63,11 +64,11 @@ export abstract class Shape extends BaseShape {
     return port.location === 'left' ? nextPosition : nextPosition + 32;
   }
 
-  preferredPortPosition(shapes: Shape[]): number {
+  preferredPortPosition(shapes: BaseShape[]): number {
     return this.getPosition(shapes).y - this.getHeight(shapes) / 10;
   }
 
-  getPosition(shapes: Shape[]): { x: number; y: number } {
+  getPosition(shapes: BaseShape[]): { x: number; y: number } {
     const preferred = this.preferredPosition(shapes);
     const sameKind = shapes.filter(shape => shape.kind === this.kind);
 
@@ -85,7 +86,7 @@ export abstract class Shape extends BaseShape {
   }
 
   getOverflowPosition(
-    shapes: Shape[],
+    shapes: BaseShape[],
     preferred: { x: number; y: number },
     index: number
   ): { x: number; y: number } {
@@ -109,12 +110,12 @@ export abstract class Shape extends BaseShape {
     }
   }
 
-  getChildPosition(shapes: Shape[], target: Shape): { x: number; y: number } {
+  getChildPosition(shapes: BaseShape[], target: Shape): { x: number; y: number } {
     const defaultPos = this.getPosition(shapes);
     return { x: defaultPos.x + 25, y: defaultPos.y + 25 };
   }
 
-  getPortPosition(shapes: Shape[], port: Port): { x: number; y: number } {
+  getPortPosition(shapes: BaseShape[], port: Port): { x: number; y: number } {
     const textWidth = this.getTextWidth(port.getLabel()) + 24;
     const { x } = this.getPosition(shapes);
     const portY = this.nextPortPosition(
@@ -140,13 +141,13 @@ export abstract class Shape extends BaseShape {
     return true;
   }
 
-  private getLabel() {
+  private getLabel(): string {
     return this.label.length > 40
       ? this.label.substring(0, 40) + '...'
       : this.label;
   }
 
-  getTextWidth(txt) {
+  getTextWidth(txt): number {
     if (!this.textMeasureCanvas) {
       this.textMeasureCanvas = document.createElement('canvas');
     }
@@ -156,7 +157,7 @@ export abstract class Shape extends BaseShape {
     return context.measureText(txt).width;
   }
 
-  toNode(shapes: Shape[]) {
+  toNode(shapes: BaseShape[]): ElementDefinition {
     const { x, y } = this.getPosition(shapes);
     return {
       data: {
@@ -171,23 +172,21 @@ export abstract class Shape extends BaseShape {
         hasChildren: this.hasChildren,
       },
       group: 'nodes',
-      removed: false,
       selected: false,
       selectable: this.isSelectable(),
       locked: false,
       grabbable: this.isMovable(),
-      pannable: false,
       classes: this.classes,
     };
   }
 
-  protected getParent(shapes: Shape[]) {
-    return shapes.find((shape: Shape) => shape.id === this.parentId);
+  protected getParent(shapes: BaseShape[]): Shape {
+    return shapes.find((shape: BaseShape) => shape.id === this.parentId) as Shape;
   }
 
-  findByClass(shapes: Shape[], cl: string): Shape[] {
+  findByClass(shapes: BaseShape[], cl: string): Shape[] {
     return shapes
-      .filter(shape => shape && shape.classes === cl)
+      .filter((shape: Shape) => shape && shape.classes === cl)
       .sort((first: Shape, second: Shape) => {
         // sort by number of connections
         const firstConnections = shapes.filter(
@@ -202,7 +201,7 @@ export abstract class Shape extends BaseShape {
         ).length;
 
         return secondConnections - firstConnections;
-      });
+      }) as Shape[];
   }
 }
 
@@ -219,31 +218,31 @@ export class Deployment extends Shape {
     this.overflowDirection = OverflowDirectionType.DOWN_RIGHT;
   }
 
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     const replicas = this.totalReplicas(shapes);
     return { x: 800 + (replicas - 1) * (this.preferedWidth / 2 - 25), y: 475 };
   }
 
-  preferredPortPosition(shapes: Shape[]): number {
+  preferredPortPosition(shapes: BaseShape[]): number {
     return (2 * this.getPosition(shapes).y) / 3;
   }
 
-  getWidth(shapes: Shape[]): number {
+  getWidth(shapes: BaseShape[]): number {
     const replicas = Math.max(1, this.totalReplicas(shapes));
     return this.preferedWidth + (replicas - 1) * (this.preferedWidth - 100);
   }
 
-  getHeight(shapes: Shape[]): number {
+  getHeight(shapes: BaseShape[]): number {
     return this.preferedHeight;
   }
 
-  private totalReplicas(shapes: Shape[]): number {
+  private totalReplicas(shapes: BaseShape[]): number {
     return shapes.filter(
-      shape => shape.parentId === this.id && shape.kind === 'ReplicaSet'
+      (shape: Shape) => shape.parentId === this.id && shape.kind === 'ReplicaSet'
     ).length;
   }
 
-  getChildPosition(shapes: Shape[], target: Shape): { x: number; y: number } {
+  getChildPosition(shapes: BaseShape[], target: Shape): { x: number; y: number } {
     const replicas = this.totalReplicas(shapes);
     const defaultPos =
       replicas > 1
@@ -273,7 +272,7 @@ export class DaemonSet extends Shape {
     this.classes = 'sets status';
   }
 
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 825, y: 475 };
   }
 }
@@ -291,7 +290,7 @@ export class Job extends Shape {
     this.overflowDirection = OverflowDirectionType.RIGHT;
   }
 
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 825, y: 475 };
   }
 }
@@ -309,7 +308,7 @@ export class CronJob extends Shape {
     this.overflowDirection = OverflowDirectionType.DOWN_RIGHT;
   }
 
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 0, y: 200 };
   }
 }
@@ -326,7 +325,7 @@ export class StatefulSet extends Shape {
     this.classes = 'sets status';
   }
 
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 825, y: 475 };
   }
 }
@@ -343,7 +342,7 @@ export class Secret extends Shape {
     this.classes = 'secret status';
   }
 
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 100, y: 1100 };
   }
 }
@@ -360,7 +359,7 @@ export class ServiceAccount extends Shape {
     this.classes = 'secret status';
   }
 
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 600, y: 1100 };
   }
 }
@@ -377,7 +376,7 @@ export class Service extends Shape {
     this.classes = 'secret status';
   }
 
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 0, y: 525 };
   }
 }
@@ -394,7 +393,7 @@ export class Ingress extends Shape {
     this.classes = 'secret status';
   }
 
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: -450, y: 525 };
   }
 }
@@ -411,7 +410,7 @@ export class ConfigMap extends Shape {
     this.classes = 'secret status';
   }
 
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 1100, y: 1100 };
   }
 }
@@ -428,7 +427,7 @@ export class Node extends Shape {
     this.classes = 'secret status';
   }
 
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 0, y: 0 };
   }
 }
@@ -445,7 +444,7 @@ export class Namespace extends Shape {
     this.classes = 'secret status';
   }
 
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 0, y: 0 };
   }
 }
@@ -461,7 +460,7 @@ export class Event extends Shape {
     super(id, status, 'Event', label, 350, 200, hasChildren, parentId);
   }
 
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 0, y: 0 };
   }
 }
@@ -477,7 +476,7 @@ export class ClusterRole extends Shape {
     super(id, status, 'ClusterRole', label, 350, 200, hasChildren, parentId);
   }
 
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 0, y: 0 };
   }
 }
@@ -502,7 +501,7 @@ export class ClusterRoleBinding extends Shape {
     );
   }
 
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 0, y: 0 };
   }
 }
@@ -518,7 +517,7 @@ export class Role extends Shape {
     super(id, status, 'Role', label, 350, 200, hasChildren, parentId);
   }
 
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 0, y: 0 };
   }
 }
@@ -534,7 +533,7 @@ export class RoleBinding extends Shape {
     super(id, status, 'RoleBinding', label, 350, 200, hasChildren, parentId);
   }
 
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 0, y: 0 };
   }
 }
@@ -558,7 +557,7 @@ export class PersistentVolume extends Shape {
       parentId
     );
   }
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 0, y: 0 };
   }
 }
@@ -582,7 +581,7 @@ export class PersistentVolumeClaim extends Shape {
       parentId
     );
   }
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 0, y: 0 };
   }
 }
@@ -606,7 +605,7 @@ export class HorizontalPodAutoscaler extends Shape {
       parentId
     );
   }
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 0, y: 0 };
   }
 }
@@ -621,7 +620,7 @@ export class NetworkPolicy extends Shape {
   ) {
     super(id, status, 'NetworkPolicy', label, 350, 200, hasChildren, parentId);
   }
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 0, y: 0 };
   }
 }
@@ -636,7 +635,7 @@ export class PodMetrics extends Shape {
   ) {
     super(id, status, 'PodMetrics', label, 350, 200, hasChildren, parentId);
   }
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 0, y: 0 };
   }
 }
@@ -660,7 +659,7 @@ export class ReplicationController extends Shape {
       parentId
     );
   }
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 0, y: 0 };
   }
 }
@@ -685,7 +684,7 @@ export class CRD extends Shape {
     );
   }
 
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 0, y: 0 };
   }
 }
@@ -703,7 +702,7 @@ export class Unknown extends Shape {
     this.classes = 'unknown status';
   }
 
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     const unknowns = this.findByClass(shapes, 'unknown status');
     const total = unknowns.length;
     const index = unknowns.findIndex(shape => shape.id === this.id);
@@ -734,7 +733,7 @@ export class ReplicaSet extends Shape {
     this.classes = 'replicaset status';
   }
 
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 850, y: 500 };
   }
 }
@@ -751,11 +750,11 @@ export class Pod extends Shape {
     this.classes = 'pod status';
   }
 
-  preferredPortPosition(shapes: Shape[]): number {
+  preferredPortPosition(shapes: BaseShape[]): number {
     return this.getPosition(shapes).y - this.getHeight(shapes) / 7;
   }
 
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 875, y: 525 };
   }
 }
@@ -783,11 +782,11 @@ export class Port extends Shape {
     return false;
   }
 
-  preferredPosition(shapes: Shape[]): { x: number; y: number } {
+  preferredPosition(shapes: BaseShape[]): { x: number; y: number } {
     return { x: 750, y: 450 };
   }
 
-  getPosition(shapes: Shape[]): { x: number; y: number } {
+  getPosition(shapes: BaseShape[]): { x: number; y: number } {
     const parentNode = this.getParent(shapes);
     const portPosition = parentNode.getPortPosition(shapes, this);
     this.currentPosition = portPosition;

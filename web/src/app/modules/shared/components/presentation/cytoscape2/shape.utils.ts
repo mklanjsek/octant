@@ -31,58 +31,42 @@ import {
   Unknown,
 } from './shapes';
 import { Edge } from './edges';
-
-interface BackendSingleEdgeDef {
-  node: string;
-  edge: string;
-  connector: string;
-  connectorType: string;
-}
-
-interface BackendEdgeDef {
-  source: BackendSingleEdgeDef;
-  destination: BackendSingleEdgeDef;
-}
-
-type BackendEdgesDef = Record<string, BackendEdgeDef>;
+import { BackendEdgeDef, BackendEdgesDef, BackendSingleEdgeDef } from '../../../models/content';
 
 export abstract class ShapeUtils {
-  static loadShapes(data): any {
-    const newShapes = Object.entries(data.nodes).map(([key, value]) =>
-      ShapeUtils.fromDataStream(key, value)
-    );
-
-    if (data.edges) {
-      ShapeUtils.createEdges(newShapes, data.edges);
-    }
-
-    newShapes.sort(
-      (a: BaseShape, b: BaseShape) =>
-        ShapeUtils.shapeOrder(a.kind) - ShapeUtils.shapeOrder(b.kind)
-    );
-
-    const nodes = newShapes.map(shape => shape && shape.toNode(newShapes));
-    return ShapeUtils.addHeaderNodes(newShapes, nodes);
+  static consolidatePosition(shapes: BaseShape[], cyNodes: any) {
+    shapes.forEach((baseShape: BaseShape) => {
+      const shape = baseShape as Shape;
+      const node = cyNodes.nodes(`[id = '${shape.id}']`);
+      node.data('x', node.position('x'));
+      node.data('y', node.position('y'));
+    });
   }
 
-  static addHeaderNodes(shapes: BaseShape[], nodes: any) {
-    shapes.forEach((shape: Shape) => {
+  static addHeaderNodes(shapes: BaseShape[], cyNodes: any) {
+    const nodes: any = [];
+    shapes.forEach((baseShape: BaseShape) => {
+      const shape = baseShape as Shape;
       if (shape.label && shape.kind !== 'Port') {
         const labels = shape.label.split('\n');
         labels.forEach((label, index) => {
-          const { x, y } = shape.getPosition(shapes as Shape[]);
+          const node = cyNodes.nodes(`[id = '${shape.id}']`);
           const headerWidth = (shape.getWidth(shapes as Shape[]) * 9) / 10;
-
+          const x =  node.data('x') - shape.getWidth(shapes as Shape[]) / 2 + headerWidth / 2 - 6;
+          const y =  node.data('y') - shape.getHeight(shapes as Shape[]) / 2 + 8 + index * 24;
           const headerNode = {
+            position: {
+              x: x,
+              y: y,
+            },
             data: {
               id: `${shape.id}-header-${index}`,
               label,
               owner: shape.id,
               width: headerWidth,
               height: 24,
-              x:
-                x - shape.getWidth(shapes as Shape[]) / 2 + headerWidth / 2 - 6,
-              y: y - shape.getHeight(shapes as Shape[]) / 2 + 8 + index * 24,
+              x: x,
+              y: y,
               hasChildren: false,
             },
             group: 'nodes',
@@ -102,12 +86,28 @@ export abstract class ShapeUtils {
     return nodes;
   }
 
-  static createEdges(shapes: BaseShape[], edges: BackendEdgesDef) {
+  static getEdgeNode(shapes: BaseShape[], nodeId: string, useParent: boolean) {
+    if(useParent) {
+      let edgeNode: string;
+      let parentNode= nodeId;
+
+      do {
+        edgeNode= parentNode;
+        const node: Shape = ShapeUtils.findById(shapes, edgeNode)[0] as Shape;
+        parentNode= node.parentId
+      } while (parentNode && parentNode.length > 0);
+
+      return edgeNode;
+    }
+    return nodeId;
+  }
+
+  static createEdges(shapes: BaseShape[], edges: BackendEdgesDef, usePorts: boolean, useParents: boolean) {
     if (edges) {
       Object.entries(edges).map(([key, value]) => {
         if (value.source && value.destination) {
-          const sourceId = value.source.node;
-          const targetId = value.destination.node;
+          const sourceId = ShapeUtils.getEdgeNode(shapes, value.source.node, useParents);
+          const targetId = ShapeUtils.getEdgeNode(shapes, value.destination.node, useParents);
 
           const src: BaseShape = ShapeUtils.findById(shapes, sourceId)[0];
           const trg: BaseShape = ShapeUtils.findById(shapes, targetId)[0];
@@ -118,22 +118,22 @@ export abstract class ShapeUtils {
               firsPosition,
               secondPosition,
             } = ShapeUtils.verifyEdge(shapes, value, src, trg);
-            const sourcePort = ShapeUtils.addPort(
+            const sourcePort = usePorts && ShapeUtils.addPort(
               shapes,
               edge.source,
               firsPosition
             );
-            const targetPort = ShapeUtils.addPort(
+            const targetPort = usePorts && ShapeUtils.addPort(
               shapes,
               edge.destination,
               secondPosition
             );
             const source =
-              sourcePort && sourcePort.length > 0 ? sourcePort : sourceId;
+              usePorts && sourcePort && sourcePort.length > 0 ? sourcePort : sourceId;
             const target =
               targetPort && targetPort.length > 0 ? targetPort : targetId;
             const edgeClass =
-              sourcePort.length > 0 || targetPort.length > 0 ? 'unbundled' : '';
+              usePorts && sourcePort.length > 0 || targetPort.length > 0 ? 'unbundled' : '';
 
             const nEdge = new Edge(
               `${source}-${target}`,

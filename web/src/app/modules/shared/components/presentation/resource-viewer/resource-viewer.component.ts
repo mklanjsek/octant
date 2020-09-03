@@ -16,8 +16,6 @@ import {
   ResourceViewerView,
   View,
 } from 'src/app/modules/shared/models/content';
-import { ElementsDefinition, Stylesheet } from 'cytoscape';
-import { ShapeUtils } from '../cytoscape2/shape.utils';
 import { Router } from '@angular/router';
 
 @Component({
@@ -48,11 +46,11 @@ export class ResourceViewerComponent implements OnChanges, AfterViewInit {
   };
 
   zoom = {
-    min: 0.25,
+    min: 0.075,
     max: 4.0,
   };
 
-  graphData: ElementsDefinition;
+  graphData: any;
   private afterFirstChange: boolean;
 
   constructor(private router: Router) {}
@@ -88,10 +86,10 @@ export class ResourceViewerComponent implements OnChanges, AfterViewInit {
     }
   }
 
-  generateGraphData(): ElementsDefinition {
+  generateGraphData() {
     if (this.currentView.config) {
       // console.log('data', JSON.stringify(this.currentView.config));
-      return ShapeUtils.loadShapes(this.currentView.config);
+      return this.currentView.config;
     }
   }
 

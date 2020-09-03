@@ -39,7 +39,7 @@ export function positionChildren(
 ) {
   moveChildren(cy, node, { x: 0, y: 0 });
   const options: OctantLayoutOptions = { name: 'octant', fit: false };
-  cy.nodes().layout(options).run();
+  cy.nodes(`[id = '${node.id()}']`).layout(options).run();
 }
 
 export function layoutChildren(
@@ -52,9 +52,6 @@ export function layoutChildren(
   };
   moveChildren(cy, node, offset);
   moveNode(node, offset);
-
-  const options: OctantLayoutOptions = { name: 'octant', fit: false };
-  cy.nodes().layout(options).run();
 }
 
 export function hideChildren(cy: cytoscape.Core, node: cytoscape.NodeSingular) {
@@ -108,7 +105,7 @@ OctantLayout.prototype.run = function () {
   return this; // chaining
 };
 
-function moveChildren(
+export function moveChildren(
   cy: cytoscape.Core,
   node: cytoscape.NodeSingular,
   offset
@@ -124,8 +121,13 @@ function moveChildren(
 }
 
 function moveNode(node: NodeSingular, offset: cytoscape.Position) {
-  node.data('x', node.data('x') + offset.x);
-  node.data('y', node.data('y') + offset.y);
+  const x= node.data('x') + offset.x;
+  const y= node.data('y') + offset.y;
+  node.data('x', x);
+  node.data('y', y);
+  node.position('x', x);
+  node.position('y', y);
+  node.style('visibility', 'visible');
 }
 
 export default OctantLayout;
