@@ -66,15 +66,19 @@ export const ELEMENTS_STYLE: Stylesheet[] = [
     selector: 'edge',
     css: {
       'curve-style': 'bezier',
+      'source-label': 'data(sourceLabel)',
+      'target-label': 'data(targetLabel)',
       opacity: 1,
       width: 1.5,
       'line-color': 'gray',
       'source-arrow-color': 'gray',
       'source-arrow-fill': 'hollow',
       'source-arrow-shape': 'circle',
+      'source-text-offset': 30,
       'target-arrow-color': 'gray',
       'target-arrow-fill': 'hollow',
       'target-arrow-shape': 'triangle-backcurve',
+      'target-text-offset': 30,
       'arrow-scale': 2,
       // @ts-ignore: cytoscape type definitions are out of date
       'z-compound-depth': 'top',
@@ -181,6 +185,7 @@ export const ELEMENTS_STYLE: Stylesheet[] = [
       'text-max-width': node => headerWidth(node),
       'background-opacity': 0,
       'z-index': 10,
+      'overlay-opacity': 0,
     },
   },
   {

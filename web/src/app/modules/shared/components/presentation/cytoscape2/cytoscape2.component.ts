@@ -29,6 +29,7 @@ import { ShapeUtils } from './shape.utils';
 import { ResourceViewerData } from '../../../models/content';
 import { BaseShape } from './base.shape';
 import { Shape } from './shapes';
+import { Options } from './graph.options';
 
 cytoscape.use(coseBilkent);
 cytoscape('layout', 'octant', octant);
@@ -70,6 +71,7 @@ export class Cytoscape2Component implements OnChanges, OnInit {
   moveStarted = false;
   doubleClickDelay = 400;
   previousTapStamp;
+  options= new Options(true, true);
 
   constructor(private renderer: Renderer2, private el: ElementRef) {
     this.layout = this.layout || {
@@ -101,7 +103,7 @@ export class Cytoscape2Component implements OnChanges, OnInit {
       );
       this.complexLayout= this.nodes.length >= 11;
       if (this.elements.edges) {
-        ShapeUtils.createEdges(this.nodes, this.elements.edges, !this.complexLayout, this.complexLayout);
+        ShapeUtils.createEdges(this.nodes, this.elements.edges, this.options, this.complexLayout);
       }
 
       this.nodes.sort(
@@ -129,7 +131,7 @@ export class Cytoscape2Component implements OnChanges, OnInit {
       minZoom: this.zoom.min,
       maxZoom: this.zoom.max,
       style: this.style,
-      elements: this.nodes.map(shape => shape && shape.toNode(this.nodes)),
+      elements: this.nodes.map(shape => shape && shape.toNode(this.nodes, this.options)),
     };
     this.cytoscape = cytoscape(options);
 
@@ -152,9 +154,9 @@ export class Cytoscape2Component implements OnChanges, OnInit {
         if(this.complexLayout) {
           const layoutSpread = this.cytoscape.nodes().layout({
             name: 'spread', fit: true, prelayout: { name: 'octant' }, animate: true,
-            expandingFactor: 0.2,
-            maxExpandIterations: 10,
-            minDist: 750, padding: 20
+            expandingFactor: 0.1,
+            maxExpandIterations: 100,
+            minDist: 550, padding: 20
           } as BaseLayoutOptions);
           layoutSpread.run();
         } else {
@@ -162,6 +164,7 @@ export class Cytoscape2Component implements OnChanges, OnInit {
           this.cytoscape.add(headers);
           const finalLayout = this.cytoscape.nodes().layout({ name: 'octant' })
           finalLayout.run();
+          ShapeUtils.createPorts(this.cytoscape, this.nodes, this.cytoscape.nodes(), this.options);
           this.cytoscape
             .nodes()
             .forEach(node => {
@@ -172,6 +175,8 @@ export class Cytoscape2Component implements OnChanges, OnInit {
       }
       else if (e.layout.options.name === 'spread' && !this.applied) {
         this.applied = true;
+        ShapeUtils.createPorts(this.cytoscape, this.nodes, this.cytoscape.nodes(), this.options);
+
         this.nodes.filter((node: Shape) => node.hasChildren).forEach(shape => {
           const cyNode=this.cytoscape.nodes(`[id = '${shape.id}']`)[0];
           layoutChildren(this.cytoscape, cyNode);
@@ -185,7 +190,6 @@ export class Cytoscape2Component implements OnChanges, OnInit {
           .forEach(node => {
             node.style('visibility', 'visible');
           });
-        this.cytoscape.fit(undefined, 20);
         done = true;
       }
       if(done) {

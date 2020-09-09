@@ -32,6 +32,8 @@ import {
 } from './shapes';
 import { Edge } from './edges';
 import { BackendEdgeDef, BackendEdgesDef, BackendSingleEdgeDef } from '../../../models/content';
+import cytoscape from 'cytoscape';
+import { Options } from './graph.options';
 
 export abstract class ShapeUtils {
   static consolidatePosition(shapes: BaseShape[], cyNodes: any) {
@@ -102,48 +104,74 @@ export abstract class ShapeUtils {
     return nodeId;
   }
 
-  static createEdges(shapes: BaseShape[], edges: BackendEdgesDef, usePorts: boolean, useParents: boolean) {
+  static createEdges(shapes: BaseShape[], edges: BackendEdgesDef, options: Options, useParents: boolean) {
     if (edges) {
       Object.entries(edges).map(([key, value]) => {
         if (value.source && value.destination) {
           const sourceId = ShapeUtils.getEdgeNode(shapes, value.source.node, useParents);
           const targetId = ShapeUtils.getEdgeNode(shapes, value.destination.node, useParents);
 
-          const src: BaseShape = ShapeUtils.findById(shapes, sourceId)[0];
-          const trg: BaseShape = ShapeUtils.findById(shapes, targetId)[0];
+          const src: Shape = ShapeUtils.findById(shapes, sourceId)[0] as Shape;
+          const trg: Shape = ShapeUtils.findById(shapes, targetId)[0] as Shape;
 
           if (src && trg && src.kind !== trg.kind) {
             const {
               edge,
-              firsPosition,
+              firstPosition,
               secondPosition,
             } = ShapeUtils.verifyEdge(shapes, value, src, trg);
-            const sourcePort = usePorts && ShapeUtils.addPort(
-              shapes,
-              edge.source,
-              firsPosition
-            );
-            const targetPort = usePorts && ShapeUtils.addPort(
-              shapes,
-              edge.destination,
-              secondPosition
-            );
-            const source =
-              usePorts && sourcePort && sourcePort.length > 0 ? sourcePort : sourceId;
-            const target =
-              targetPort && targetPort.length > 0 ? targetPort : targetId;
-            const edgeClass =
-              usePorts && sourcePort.length > 0 || targetPort.length > 0 ? 'unbundled' : '';
 
+            if(options.usePorts) {
+              src.hasChildren= true;
+              trg.hasChildren= true;
+            }
             const nEdge = new Edge(
-              `${source}-${target}`,
-              target,
-              source,
-              edgeClass
+              `${value.source.node}-${value.destination.node}`,
+              targetId,
+              sourceId,
+              edge,
+              firstPosition,
+              secondPosition,
+              ''
             );
             shapes.push(nEdge);
           }
         }
+      });
+    }
+  }
+
+  static createPorts(cy: cytoscape.Core, shapes: BaseShape[], cyNodes: any, options: Options) {
+    if( options.showDetails && options.usePorts) {
+      const edges= ShapeUtils.findByKind(shapes, 'Edge') as Edge[];
+      const edgesToMove=[];
+      edges.forEach(edge => {
+        if(edge.edge.source.connectorType !== 'unknown') {
+          const src: Shape = ShapeUtils.findById(shapes, edge.sourceId)[0] as Shape;
+          const trg: Shape = ShapeUtils.findById(shapes, edge.targetId)[0] as Shape;
+          const sourcePort = ShapeUtils.addPort(
+            shapes,
+            edge.edge.source,
+            edge.firstPosition
+          );
+          const targetPort = ShapeUtils.addPort(
+            shapes,
+            edge.edge.destination,
+            edge.secondPosition
+          );
+
+          edgesToMove.push({ edge: edge.id, first: targetPort, second: sourcePort }) // ???
+          src.hasChildren = true;
+          trg.hasChildren = true;
+        }
+      });
+
+      cy.add(ShapeUtils.findByKind(shapes, 'Port').map(port => port && port.toNode(shapes, options)));
+
+      edgesToMove.forEach(moved => {
+        const cyEdge= cy.edges(`[id = '${moved.edge}']`)[0];
+        cyEdge.move({ source: moved.first, target: moved.second });
+        cyEdge.addClass('unbundled');
       });
     }
   }
@@ -153,13 +181,14 @@ export abstract class ShapeUtils {
     edge: BackendEdgeDef,
     sourceShape: BaseShape,
     targetShape: BaseShape
-  ): { edge: any; firsPosition: string; secondPosition: string } {
+  ): { edge: any; firstPosition: string; secondPosition: string } {
     const flow = sourceShape.kind + '-' + targetShape.kind;
     const firstPosition = 'left';
     const secondPosition = 'right';
     let swap = false;
 
     switch (flow) {
+      case 'Service-Deployment':
       case 'Service-Pod':
       case 'Ingress-Service':
       case 'ServiceAccount-Pod':
@@ -174,7 +203,7 @@ export abstract class ShapeUtils {
     if (swap) {
       edge = { source: edge.destination, destination: edge.source };
     }
-    return { edge, firsPosition: firstPosition, secondPosition };
+    return { edge, firstPosition, secondPosition };
   }
 
   static addPort(

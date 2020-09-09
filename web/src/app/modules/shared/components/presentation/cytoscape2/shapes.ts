@@ -1,5 +1,6 @@
 import { BaseShape } from './base.shape';
 import { ElementDefinition } from 'cytoscape';
+import { Options } from './graph.options';
 
 enum OverflowDirectionType {
   DOWN,
@@ -157,7 +158,7 @@ export abstract class Shape extends BaseShape {
     return context.measureText(txt).width;
   }
 
-  toNode(shapes: BaseShape[]): ElementDefinition {
+  toNode(shapes: BaseShape[], options: Options): ElementDefinition {
     const { x, y } = this.getPosition(shapes);
     return {
       data: {
