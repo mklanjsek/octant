@@ -5,6 +5,9 @@ import {
 } from 'cytoscape';
 import cytoscape from 'cytoscape';
 import { isFunction } from 'rxjs/internal-compatibility';
+import { BaseShape } from './base.shape';
+import { ShapeUtils } from './shape.utils';
+import { Shape } from './shapes';
 
 export interface OctantLayoutOptions
   extends BaseLayoutOptions,
@@ -33,30 +36,22 @@ const defaults = {
   },
 };
 
-export function positionChildren(
-  cy: cytoscape.Core,
-  node: cytoscape.NodeSingular
-) {
-  moveChildren(cy, node, { x: 0, y: 0 });
-  const options: OctantLayoutOptions = { name: 'octant', fit: false };
-  cy.nodes(`[id = '${node.id()}']`).layout(options).run();
-}
-
 export function layoutChildren(
+  shapes: BaseShape[],
   cy: cytoscape.Core,
-  node: cytoscape.NodeSingular
+  node: cytoscape.NodeSingular,
+  showNodes: boolean
 ) {
   const offset = {
     x: node.position().x - node.data('x'),
     y: node.position().y - node.data('y'),
   };
-  moveChildren(cy, node, offset);
-  moveNode(node, offset);
+  moveChildren(shapes, cy, node, offset, showNodes);
+  moveNode(shapes, node, offset, showNodes);
 }
 
 export function hideChildren(cy: cytoscape.Core, node: cytoscape.NodeSingular) {
   const children = cy.nodes(`[owner = "${node.data('id')}"]`);
-
   children.map(child => {
     hideChildren(cy, child);
     child.style('visibility', 'hidden');
@@ -105,29 +100,42 @@ OctantLayout.prototype.run = function () {
   return this; // chaining
 };
 
-export function moveChildren(
+function moveChildren(
+  shapes: BaseShape[],
   cy: cytoscape.Core,
   node: cytoscape.NodeSingular,
-  offset
+  offset,
+  showNodes: boolean
 ) {
   const children = cy.nodes(`[owner = "${node.data('id')}"]`);
 
   children.map(child => {
-    moveNode(child, offset);
-    child.style('visibility', 'visible');
-    moveChildren(cy, child, offset);
+    moveNode(shapes, child, offset, showNodes);
+    moveChildren(shapes, cy, child, offset, showNodes);
   });
   return children;
 }
 
-function moveNode(node: NodeSingular, offset: cytoscape.Position) {
-  const x= node.data('x') + offset.x;
-  const y= node.data('y') + offset.y;
+function moveNode(
+  shapes: BaseShape[],
+  node: NodeSingular,
+  offset: cytoscape.Position,
+  showNodes: boolean
+) {
+  const x = node.data('x') + offset.x;
+  const y = node.data('y') + offset.y;
+  const shape = ShapeUtils.findById(shapes, node.data('id'))[0] as Shape;
+
   node.data('x', x);
   node.data('y', y);
   node.position('x', x);
   node.position('y', y);
-  node.style('visibility', 'visible');
+  if (shape) {
+    shape.setCurrentPosition({ x, y });
+  }
+  if (showNodes) {
+    node.style('visibility', 'visible');
+  }
 }
 
 export default OctantLayout;

@@ -31,7 +31,11 @@ import {
   Unknown,
 } from './shapes';
 import { Edge } from './edges';
-import { BackendEdgeDef, BackendEdgesDef, BackendSingleEdgeDef } from '../../../models/content';
+import {
+  BackendEdgeDef,
+  BackendEdgesDef,
+  BackendSingleEdgeDef,
+} from '../../../models/content';
 import cytoscape from 'cytoscape';
 import { Options } from './graph.options';
 
@@ -54,12 +58,20 @@ export abstract class ShapeUtils {
         labels.forEach((label, index) => {
           const node = cyNodes.nodes(`[id = '${shape.id}']`);
           const headerWidth = (shape.getWidth(shapes as Shape[]) * 9) / 10;
-          const x =  node.data('x') - shape.getWidth(shapes as Shape[]) / 2 + headerWidth / 2 - 6;
-          const y =  node.data('y') - shape.getHeight(shapes as Shape[]) / 2 + 8 + index * 24;
+          const x =
+            node.data('x') -
+            shape.getWidth(shapes as Shape[]) / 2 +
+            headerWidth / 2 -
+            6;
+          const y =
+            node.data('y') -
+            shape.getHeight(shapes as Shape[]) / 2 +
+            8 +
+            index * 24;
           const headerNode = {
             position: {
-              x: x,
-              y: y,
+              x,
+              y,
             },
             data: {
               id: `${shape.id}-header-${index}`,
@@ -67,8 +79,8 @@ export abstract class ShapeUtils {
               owner: shape.id,
               width: headerWidth,
               height: 24,
-              x: x,
-              y: y,
+              x,
+              y,
               hasChildren: false,
             },
             group: 'nodes',
@@ -88,31 +100,45 @@ export abstract class ShapeUtils {
     return nodes;
   }
 
-  static getEdgeNode(shapes: BaseShape[], nodeId: string, useParent: boolean) {
-    if(useParent) {
-      let edgeNode: string;
-      let parentNode= nodeId;
+  static getParentNode(shapes: BaseShape[], nodeId: string) {
+    let edgeNode: string;
+    let parentNode = nodeId;
 
-      do {
-        edgeNode= parentNode;
-        const node: Shape = ShapeUtils.findById(shapes, edgeNode)[0] as Shape;
-        parentNode= node.parentId
-      } while (parentNode && parentNode.length > 0);
+    do {
+      edgeNode = parentNode;
+      const node: Shape = ShapeUtils.findById(shapes, edgeNode)[0] as Shape;
+      parentNode = node.parentId;
+    } while (parentNode && parentNode.length > 0);
 
-      return edgeNode;
-    }
-    return nodeId;
+    return edgeNode;
   }
 
-  static createEdges(shapes: BaseShape[], edges: BackendEdgesDef, options: Options, useParents: boolean) {
+  static createEdges(
+    shapes: BaseShape[],
+    edges: BackendEdgesDef,
+    options: Options,
+    useParents: boolean
+  ) {
     if (edges) {
       Object.entries(edges).map(([key, value]) => {
         if (value.source && value.destination) {
-          const sourceId = ShapeUtils.getEdgeNode(shapes, value.source.node, useParents);
-          const targetId = ShapeUtils.getEdgeNode(shapes, value.destination.node, useParents);
+          const parentSourceId = ShapeUtils.getParentNode(
+            shapes,
+            value.source.node
+          );
+          const parentTargetId = ShapeUtils.getParentNode(
+            shapes,
+            value.destination.node
+          );
 
-          const src: Shape = ShapeUtils.findById(shapes, sourceId)[0] as Shape;
-          const trg: Shape = ShapeUtils.findById(shapes, targetId)[0] as Shape;
+          const src: Shape = ShapeUtils.findById(
+            shapes,
+            parentSourceId
+          )[0] as Shape;
+          const trg: Shape = ShapeUtils.findById(
+            shapes,
+            parentTargetId
+          )[0] as Shape;
 
           if (src && trg && src.kind !== trg.kind) {
             const {
@@ -121,14 +147,22 @@ export abstract class ShapeUtils {
               secondPosition,
             } = ShapeUtils.verifyEdge(shapes, value, src, trg);
 
-            if(options.usePorts) {
-              src.hasChildren= true;
-              trg.hasChildren= true;
+            if (options.usePorts && options.showDetails) {
+              src.hasChildren = true;
+              trg.hasChildren = true;
             }
             const nEdge = new Edge(
               `${value.source.node}-${value.destination.node}`,
-              targetId,
-              sourceId,
+              value.source.node,
+              value.destination.node,
+              parentTargetId,
+              parentSourceId,
+              src.parentId && src.parentId.length > 0
+                ? src.parentId
+                : value.source.node,
+              trg.parentId && trg.parentId.length > 0
+                ? trg.parentId
+                : value.destination.node,
               edge,
               firstPosition,
               secondPosition,
@@ -141,14 +175,16 @@ export abstract class ShapeUtils {
     }
   }
 
-  static createPorts(cy: cytoscape.Core, shapes: BaseShape[], cyNodes: any, options: Options) {
-    if( options.showDetails && options.usePorts) {
-      const edges= ShapeUtils.findByKind(shapes, 'Edge') as Edge[];
-      const edgesToMove=[];
+  static createPorts(
+    cy: cytoscape.Core,
+    shapes: BaseShape[],
+    cyNodes: any,
+    options: Options
+  ) {
+    const edges = ShapeUtils.findByKind(shapes, 'Edge') as Edge[];
+    if (options.showDetails && options.usePorts) {
       edges.forEach(edge => {
-        if(edge.edge.source.connectorType !== 'unknown') {
-          const src: Shape = ShapeUtils.findById(shapes, edge.sourceId)[0] as Shape;
-          const trg: Shape = ShapeUtils.findById(shapes, edge.targetId)[0] as Shape;
+        if (edge.edge.source.connectorType !== 'unknown') {
           const sourcePort = ShapeUtils.addPort(
             shapes,
             edge.edge.source,
@@ -159,21 +195,39 @@ export abstract class ShapeUtils {
             edge.edge.destination,
             edge.secondPosition
           );
-
-          edgesToMove.push({ edge: edge.id, first: targetPort, second: sourcePort }) // ???
-          src.hasChildren = true;
-          trg.hasChildren = true;
+          edge.sourceId = sourcePort;
+          edge.targetId = targetPort;
         }
       });
-
-      cy.add(ShapeUtils.findByKind(shapes, 'Port').map(port => port && port.toNode(shapes, options)));
-
-      edgesToMove.forEach(moved => {
-        const cyEdge= cy.edges(`[id = '${moved.edge}']`)[0];
-        cyEdge.move({ source: moved.first, target: moved.second });
-        cyEdge.addClass('unbundled');
-      });
+      cy.add(
+        ShapeUtils.findByKind(shapes, 'Port').map(
+          port => port && port.toNode(shapes, options)
+        )
+      );
     }
+
+    edges.forEach(edge => {
+      let cyEdge = cy.edges(`[id = '${edge.id}']`)[0];
+      if (!cyEdge) {
+        cyEdge = cy.add(edge.toNode(shapes, options));
+      }
+      if (
+        edge.getSourceId(options) !== cyEdge.data('source') ||
+        edge.getTargetId(options) !== cyEdge.data('target')
+      ) {
+        cyEdge.move({
+          source: edge.getSourceId(options),
+          target: edge.getTargetId(options),
+        });
+      }
+      cyEdge.data('sourceLabel', edge.getSourceLabel(options));
+      cyEdge.data('targetLabel', edge.getTargetLabel(options));
+      if (options.showDetails && options.usePorts) {
+        cyEdge.addClass('unbundled');
+      } else {
+        cyEdge.removeClass('unbundled');
+      }
+    });
   }
 
   static verifyEdge(
@@ -183,9 +237,9 @@ export abstract class ShapeUtils {
     targetShape: BaseShape
   ): { edge: any; firstPosition: string; secondPosition: string } {
     const flow = sourceShape.kind + '-' + targetShape.kind;
-    const firstPosition = 'left';
-    const secondPosition = 'right';
-    let swap = false;
+    const firstPosition = 'right';
+    const secondPosition = 'left';
+    let swap = true;
 
     switch (flow) {
       case 'Service-Deployment':
@@ -197,7 +251,7 @@ export abstract class ShapeUtils {
         //      case 'HorizontalPodAutoscaler-Deployment'
         //      case 'HorizontalPodAutoscaler-ReplicaSet'
         //      case 'HorizontalPodAutoscaler-ReplicationController'
-        swap = true;
+        swap = false;
         break;
     }
     if (swap) {

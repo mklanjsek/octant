@@ -270,8 +270,8 @@ export interface BackendEdgeDef {
 export type BackendEdgesDef = Record<string, BackendEdgeDef>;
 
 export interface ResourceViewerData extends View {
-    edges: Record<string, BackendEdgeDef>;
-    nodes: Node[];
+  edges: Record<string, BackendEdgeDef>;
+  nodes: Node[];
 }
 
 export interface SelectorsView extends View {

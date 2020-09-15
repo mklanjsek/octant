@@ -31,6 +31,21 @@ export abstract class Shape extends BaseShape {
 
   ports: Shape[] = [];
 
+  currentPosition = { x: 0, y: 0 };
+  setCurrentPosition(position) {
+    this.currentPosition = position;
+  }
+
+  getCurrentPosition() {
+    return this.currentPosition;
+  }
+
+  public deletePorts() {
+    if (this.ports && this.ports.length > 0) {
+      this.ports = [];
+    }
+  }
+
   abstract preferredPosition(shapes: BaseShape[]): { x: number; y: number };
 
   getWidth(shapes: BaseShape[]): number {
@@ -70,8 +85,13 @@ export abstract class Shape extends BaseShape {
   }
 
   getPosition(shapes: BaseShape[]): { x: number; y: number } {
-    const preferred = this.preferredPosition(shapes);
+    const current = this.getCurrentPosition();
+    if (current.y !== 0 || current.y !== 0) {
+      return this.getCurrentPosition();
+    }
+
     const sameKind = shapes.filter(shape => shape.kind === this.kind);
+    const preferred = this.preferredPosition(shapes);
 
     if (sameKind.length > 1 && this.parentId) {
       const parentNode = this.getParent(shapes);
@@ -111,7 +131,10 @@ export abstract class Shape extends BaseShape {
     }
   }
 
-  getChildPosition(shapes: BaseShape[], target: Shape): { x: number; y: number } {
+  getChildPosition(
+    shapes: BaseShape[],
+    target: Shape
+  ): { x: number; y: number } {
     const defaultPos = this.getPosition(shapes);
     return { x: defaultPos.x + 25, y: defaultPos.y + 25 };
   }
@@ -182,7 +205,9 @@ export abstract class Shape extends BaseShape {
   }
 
   protected getParent(shapes: BaseShape[]): Shape {
-    return shapes.find((shape: BaseShape) => shape.id === this.parentId) as Shape;
+    return shapes.find(
+      (shape: BaseShape) => shape.id === this.parentId
+    ) as Shape;
   }
 
   findByClass(shapes: BaseShape[], cl: string): Shape[] {
@@ -239,11 +264,15 @@ export class Deployment extends Shape {
 
   private totalReplicas(shapes: BaseShape[]): number {
     return shapes.filter(
-      (shape: Shape) => shape.parentId === this.id && shape.kind === 'ReplicaSet'
+      (shape: Shape) =>
+        shape.parentId === this.id && shape.kind === 'ReplicaSet'
     ).length;
   }
 
-  getChildPosition(shapes: BaseShape[], target: Shape): { x: number; y: number } {
+  getChildPosition(
+    shapes: BaseShape[],
+    target: Shape
+  ): { x: number; y: number } {
     const replicas = this.totalReplicas(shapes);
     const defaultPos =
       replicas > 1
@@ -304,7 +333,7 @@ export class CronJob extends Shape {
     hasChildren: boolean,
     parentId?: string
   ) {
-    super(id, status, 'CronJob', label, 350, 200, hasChildren, parentId);
+    super(id, status, 'CronJob', label, 350, 200, true, parentId);
     this.classes = 'secret status';
     this.overflowDirection = OverflowDirectionType.DOWN_RIGHT;
   }

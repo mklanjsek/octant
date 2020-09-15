@@ -1,0 +1,38 @@
+/* Copyright (c) 2020 the Octant contributors. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+
+::ng-deep .round-button {
+  display: inline-block;
+  text-decoration: none;
+  color: #668ad8;
+  width: 24px;
+  height: 24px;
+  line-height: 18px;
+  border-radius: 50%;
+  border: solid 2px #668ad8;
+  text-align: center;
+  vertical-align: middle;
+  overflow: hidden;
+  font-weight: bold;
+  transition: .4s;
+  margin: 2px;
+  cursor: pointer;
+}
+
+::ng-deep .round-button:hover {
+  background:#b3e1ff;
+}
+
+::ng-deep .round-button:focus {outline:0;}
+
+.cy {
+  height: 100%;
+  width: 100%;
+  position: relative;
+  background-color: #fafafa;
+  left: 0;
+  top: 0;
+}
+
