@@ -4,14 +4,13 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { OverlayScrollbarsComponent } from 'overlayscrollbars-ngx';
 import { ApplyYAMLComponent } from 'src/app/modules/sugarloaf/components/smart/apply-yaml/apply-yaml.component';
 import { LoadingService } from './loading.service';
 
 describe('LoadingService', () => {
   beforeEach(() =>
     TestBed.configureTestingModule({
-      declarations: [ApplyYAMLComponent, OverlayScrollbarsComponent],
+      declarations: [ApplyYAMLComponent],
       providers: [LoadingService],
     })
   );

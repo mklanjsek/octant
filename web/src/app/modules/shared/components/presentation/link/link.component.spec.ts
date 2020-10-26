@@ -14,6 +14,7 @@ describe('LinkComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
+        declarations: [LinkComponent],
         imports: [SharedModule, RouterTestingModule],
       }).compileComponents();
     })

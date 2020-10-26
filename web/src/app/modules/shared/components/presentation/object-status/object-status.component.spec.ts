@@ -5,10 +5,6 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ObjectStatusComponent } from './object-status.component';
 import { SharedModule } from '../../../shared.module';
-import {
-  OverlayScrollbarsComponent,
-  OverlayscrollbarsModule,
-} from 'overlayscrollbars-ngx';
 
 describe('ObjectStatusComponent', () => {
   let component: ObjectStatusComponent;
@@ -17,8 +13,8 @@ describe('ObjectStatusComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [OverlayScrollbarsComponent],
-        imports: [SharedModule, OverlayscrollbarsModule],
+        declarations: [ObjectStatusComponent],
+        imports: [SharedModule],
       }).compileComponents();
     })
   );

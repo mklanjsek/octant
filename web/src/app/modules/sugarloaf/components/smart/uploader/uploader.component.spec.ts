@@ -7,7 +7,6 @@ import { UploaderComponent } from './uploader.component';
 import { windowProvider, WindowToken } from '../../../../../window';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { IndicatorComponent } from 'src/app/modules/shared/components/presentation/indicator/indicator.component';
-import { EditorComponent } from 'src/app/modules/shared/components/smart/editor/editor.component';
 
 describe('UploaderComponent', () => {
   let component: UploaderComponent;
@@ -16,7 +15,7 @@ describe('UploaderComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [UploaderComponent, IndicatorComponent, EditorComponent],
+        declarations: [UploaderComponent, IndicatorComponent],
         imports: [SharedModule],
         providers: [{ provide: WindowToken, useFactory: windowProvider }],
       }).compileComponents();

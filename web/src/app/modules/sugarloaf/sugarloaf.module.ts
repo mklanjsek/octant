@@ -1,4 +1,4 @@
-import { Injectable, NgModule } from '@angular/core';
+import { Injectable, NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ContainerComponent } from './components/smart/container/container.component';
 import { NamespaceComponent } from './components/smart/namespace/namespace.component';
@@ -62,11 +62,17 @@ export class UnstripTrailingSlashLocation extends Location {
     // routing must come last
     RouterModule.forChild(routes),
   ],
+  exports: [
+    NamespaceComponent,
+  ],
   providers: [
     {
       provide: Location,
       useClass: UnstripTrailingSlashLocation,
     },
+  ],
+  schemas: [
+    CUSTOM_ELEMENTS_SCHEMA
   ],
 })
 export class SugarloafModule {}

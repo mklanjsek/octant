@@ -3,7 +3,6 @@
 //
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { OverlayScrollbarsComponent } from 'overlayscrollbars-ngx';
 
 import { ContainersComponent } from './containers.component';
 
@@ -14,7 +13,7 @@ describe('ContainersComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [ContainersComponent, OverlayScrollbarsComponent],
+        declarations: [ContainersComponent],
       }).compileComponents();
     })
   );

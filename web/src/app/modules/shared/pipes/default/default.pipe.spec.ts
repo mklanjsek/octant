@@ -1,15 +1,13 @@
-import { TestBed } from '@angular/core/testing';
-import { EditorComponent } from '../../components/smart/editor/editor.component';
 // Copyright (c) 2019 the Octant contributors. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 //
+import { TestBed } from '@angular/core/testing';
 import { DefaultPipe } from './default.pipe';
 import { SharedModule } from '../../shared.module';
 
 describe('DefaultPipe', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [EditorComponent],
       providers: [SharedModule],
     });
   });

@@ -5,6 +5,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Point } from '../../../models/point';
 import { HeptagonLabelComponent } from './heptagon-label.component';
+import { SharedModule } from '../../../shared.module';
 
 describe('HeptagonLabelComponent', () => {
   let component: HeptagonLabelComponent;
@@ -13,6 +14,7 @@ describe('HeptagonLabelComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [HeptagonLabelComponent],
+      imports: [SharedModule],
     }).compileComponents();
   }));
 

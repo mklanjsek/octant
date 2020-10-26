@@ -4,6 +4,7 @@ import { AlertComponent } from './alert.component';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 import { OctantTooltipComponent } from '../octant-tooltip/octant-tooltip';
+import { SharedModule } from '../../../shared.module';
 
 describe('AlertComponent', () => {
   let component: AlertComponent;
@@ -12,6 +13,7 @@ describe('AlertComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
+        imports: [SharedModule],
         declarations: [AlertComponent, OctantTooltipComponent],
       }).compileComponents();
     })

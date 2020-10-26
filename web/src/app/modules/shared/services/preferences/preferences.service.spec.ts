@@ -5,20 +5,18 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { ElectronService } from './electron.service';
+import { PreferencesService } from './preferences.service';
 import { SharedModule } from '../../shared.module';
 
-describe('ElectronService', () => {
-  let service: ElectronService;
+describe('PreferencesService', () => {
+  let service: PreferencesService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [SharedModule],
-      providers: [
-        ElectronService,
-      ],
+      providers: [PreferencesService],
     });
-    service = TestBed.inject(ElectronService);
+    service = TestBed.inject(PreferencesService);
   });
 
   it('should be created', () => {

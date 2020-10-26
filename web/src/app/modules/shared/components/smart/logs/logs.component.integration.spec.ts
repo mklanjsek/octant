@@ -217,6 +217,7 @@ describe('LogsComponent <-> PodsLogsService', () => {
     fixture.whenStable().then(() => {
       expect(logWrapperNativeElement.scrollTop).toBe(halfwayScrollMark);
     });
+    expect().nothing();
   });
 
   it('should filter messages based on search string', () => {

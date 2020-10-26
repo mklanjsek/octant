@@ -13,6 +13,7 @@ describe('ListComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
+        declarations: [ListComponent],
         imports: [SharedModule],
       }).compileComponents();
     })

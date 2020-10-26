@@ -5,10 +5,7 @@ import { inject, TestBed } from '@angular/core/testing';
 import { ThemeService } from './theme.service';
 import { DOCUMENT } from '@angular/common';
 import { MonacoEditorConfig, MonacoProviderService } from 'ng-monaco-editor';
-import {
-  OverlayScrollbarsComponent,
-  OverlayscrollbarsModule,
-} from 'overlayscrollbars-ngx';
+import { SharedModule } from '../../shared.module';
 
 describe('ThemeService', () => {
   let service: ThemeService;
@@ -16,12 +13,11 @@ describe('ThemeService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [OverlayScrollbarsComponent],
+      imports: [SharedModule],
       providers: [
         ThemeService,
         MonacoProviderService,
         MonacoEditorConfig,
-        OverlayscrollbarsModule,
         Document,
       ],
     });

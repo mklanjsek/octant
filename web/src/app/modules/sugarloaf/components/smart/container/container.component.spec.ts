@@ -34,7 +34,6 @@ import { ThemeSwitchButtonComponent } from '../theme-switch/theme-switch-button.
 import { QuickSwitcherComponent } from '../quick-switcher/quick-switcher.component';
 import {
   MonacoEditorConfig,
-  MonacoEditorModule,
   MonacoProviderService,
 } from 'ng-monaco-editor';
 import { UploaderComponent } from '../uploader/uploader.component';
@@ -43,7 +42,6 @@ import { windowProvider, WindowToken } from '../../../../../window';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-ngx';
 import { ApplyYAMLComponent } from '../apply-yaml/apply-yaml.component';
-import { EditorComponent } from 'src/app/modules/shared/components/smart/editor/editor.component';
 
 describe('AppComponent', () => {
   let component: ContainerComponent;

@@ -14,6 +14,7 @@ describe('FlexlayoutComponent', () => {
     waitForAsync(() => {
       TestBed.configureTestingModule({
         imports: [SharedModule],
+        declarations: [FlexlayoutComponent],
       }).compileComponents();
     })
   );

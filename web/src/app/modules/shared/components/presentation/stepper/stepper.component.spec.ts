@@ -98,6 +98,7 @@ describe('StepperComponent', () => {
             })
           )
         ).once();
+        expect().nothing();
       });
     })
   );

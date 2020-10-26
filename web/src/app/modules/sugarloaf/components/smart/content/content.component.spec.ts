@@ -13,6 +13,7 @@ import { ContentResponse } from '../../../../shared/models/content';
 import { ContentService } from '../../../../shared/services/content/content.service';
 import { IconService } from '../../../../shared/services/icon/icon.service';
 import { SugarloafModule } from '../../../sugarloaf.module';
+import { OverlayScrollbarsComponent, OverlayscrollbarsModule } from 'overlayscrollbars-ngx';
 
 class ContentServiceMock {
   current = new BehaviorSubject<ContentResponse>({
@@ -53,12 +54,12 @@ describe('OverviewComponent', () => {
         },
       };
       TestBed.configureTestingModule({
-        imports: [SugarloafModule],
+        imports: [SugarloafModule, OverlayscrollbarsModule],
         providers: [
           { provide: ActivatedRoute, useValue: new ActivatedRouteStub({}) },
           { provide: Router, useValue: routerMock },
           { provide: ContentService, useClass: ContentServiceMock },
-
+          OverlayScrollbarsComponent,
           IconService,
         ],
       }).compileComponents();

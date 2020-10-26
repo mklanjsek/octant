@@ -8,7 +8,6 @@ import { HeptagonComponent } from './heptagon.component';
 import { Point } from '../../../models/point';
 import { windowProvider, WindowToken } from '../../../../../window';
 import { OctantTooltipComponent } from '../../presentation/octant-tooltip/octant-tooltip';
-import { OverlayScrollbarsComponent } from 'overlayscrollbars-ngx';
 
 describe('HeptagonComponent', () => {
   let component: HeptagonComponent;
@@ -20,7 +19,6 @@ describe('HeptagonComponent', () => {
         declarations: [
           HeptagonComponent,
           OctantTooltipComponent,
-          OverlayScrollbarsComponent,
         ],
         providers: [{ provide: WindowToken, useFactory: windowProvider }],
       }).compileComponents();

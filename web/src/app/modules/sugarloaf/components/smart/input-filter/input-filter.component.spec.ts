@@ -83,6 +83,7 @@ describe('InputFilterComponent', () => {
         userTextDebugElement.nativeElement;
       expect(userTextNativeElement.textContent).toMatch(/No current filters/i);
     });
+    expect().nothing();
   }));
 
   it('should show the tags if there are filters', () => {

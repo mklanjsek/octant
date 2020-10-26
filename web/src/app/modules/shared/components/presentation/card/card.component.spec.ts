@@ -13,11 +13,6 @@ import { viewServiceStub } from 'src/app/testing/view-service.stub';
 import { SharedModule } from '../../../shared.module';
 import { FormComponent } from '../form/form.component';
 import { windowProvider, WindowToken } from '../../../../../window';
-import { EditorComponent } from '../../smart/editor/editor.component';
-import {
-  OverlayScrollbarsComponent,
-  OverlayscrollbarsModule,
-} from 'overlayscrollbars-ngx';
 
 describe('CardComponent', () => {
   let component: CardComponent;
@@ -37,8 +32,8 @@ describe('CardComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [EditorComponent, OverlayScrollbarsComponent],
-        imports: [SharedModule, OverlayscrollbarsModule],
+        declarations: [CardComponent],
+        imports: [SharedModule],
         providers: [
           { provide: FormBuilder, useValue: formBuilder },
           { provide: ViewService, useValue: viewServiceStub },

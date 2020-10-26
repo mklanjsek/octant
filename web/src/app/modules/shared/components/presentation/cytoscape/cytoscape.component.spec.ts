@@ -5,6 +5,7 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { CytoscapeComponent } from './cytoscape.component';
+import { SharedModule } from '../../../shared.module';
 
 describe('CytoscapeComponent', () => {
   let component: CytoscapeComponent;
@@ -13,6 +14,7 @@ describe('CytoscapeComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
+        imports: [SharedModule],
         declarations: [CytoscapeComponent],
       }).compileComponents();
     })

@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TextComponent } from './components/presentation/text/text.component';
 import { ClarityModule } from '@clr/angular';
@@ -291,6 +291,9 @@ import { OverlayscrollbarsModule } from 'overlayscrollbars-ngx';
     ViewContainerComponent,
     OctantTooltipComponent,
     BottomPanelComponent,
+  ],
+  schemas: [
+    CUSTOM_ELEMENTS_SCHEMA
   ],
 })
 export class SharedModule {}

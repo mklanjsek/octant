@@ -5,6 +5,7 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { AnnotationsComponent } from './annotations.component';
+import { SharedModule } from '../../../shared.module';
 
 describe('AnnotationsComponent', () => {
   let component: AnnotationsComponent;
@@ -14,6 +15,7 @@ describe('AnnotationsComponent', () => {
     waitForAsync(() => {
       TestBed.configureTestingModule({
         declarations: [AnnotationsComponent],
+        imports: [SharedModule],
       }).compileComponents();
     })
   );

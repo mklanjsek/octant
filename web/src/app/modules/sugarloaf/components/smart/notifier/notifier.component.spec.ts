@@ -3,12 +3,8 @@
 //
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import {
-  OverlayScrollbarsComponent,
-  OverlayscrollbarsModule,
-} from 'overlayscrollbars-ngx';
-
 import { NotifierComponent } from './notifier.component';
+import { SharedModule } from '../../../../shared/shared.module';
 
 describe('NotifierComponent', () => {
   let component: NotifierComponent;
@@ -17,8 +13,8 @@ describe('NotifierComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [NotifierComponent, OverlayScrollbarsComponent],
-        imports: [OverlayscrollbarsModule],
+        declarations: [NotifierComponent],
+        imports: [SharedModule],
       }).compileComponents();
     })
   );

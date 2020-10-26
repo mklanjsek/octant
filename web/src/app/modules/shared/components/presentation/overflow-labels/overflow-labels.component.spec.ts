@@ -7,7 +7,6 @@ import { OverflowLabelsComponent } from './overflow-labels.component';
 import { By } from '@angular/platform-browser';
 import { LabelFilterService } from '../../../services/label-filter/label-filter.service';
 import { windowProvider, WindowToken } from '../../../../../window';
-import { SharedModule } from '../../../shared.module';
 import { OctantTooltipComponent } from '../octant-tooltip/octant-tooltip';
 
 describe('OverflowLabelsComponent', () => {
@@ -19,7 +18,6 @@ describe('OverflowLabelsComponent', () => {
       TestBed.configureTestingModule({
         declarations: [OverflowLabelsComponent, OctantTooltipComponent],
         providers: [
-          SharedModule,
           LabelFilterService,
           { provide: WindowToken, useFactory: windowProvider },
         ],

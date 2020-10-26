@@ -13,7 +13,6 @@ import { ActivatedRouteStub } from 'src/app/testing/activated-route-stub';
 import { FiltersComponent } from './filters.component';
 import { SharedModule } from '../../../shared.module';
 import { ApplyYAMLComponent } from 'src/app/modules/sugarloaf/components/smart/apply-yaml/apply-yaml.component';
-import { OverlayScrollbarsComponent } from 'overlayscrollbars-ngx';
 
 const filterSubject = new BehaviorSubject<Filter[]>([]);
 const labelFilterService: Partial<LabelFilterService> = {
@@ -34,7 +33,7 @@ describe('FiltersComponent', () => {
       };
 
       TestBed.configureTestingModule({
-        declarations: [ApplyYAMLComponent, OverlayScrollbarsComponent],
+        declarations: [ApplyYAMLComponent],
         imports: [SharedModule],
         providers: [
           { provide: Router, useValue: mockRouter },

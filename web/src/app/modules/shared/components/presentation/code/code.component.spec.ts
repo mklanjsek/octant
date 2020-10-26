@@ -4,6 +4,7 @@
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { CodeComponent } from './code.component';
+import { SharedModule } from '../../../shared.module';
 
 describe('CodeComponent', () => {
   let component: CodeComponent;
@@ -12,6 +13,7 @@ describe('CodeComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
+        imports: [SharedModule],
         declarations: [CodeComponent],
       }).compileComponents();
     })

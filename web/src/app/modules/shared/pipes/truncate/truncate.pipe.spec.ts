@@ -1,7 +1,15 @@
 import { TruncatePipe } from './truncate.pipe';
+import { TestBed } from '@angular/core/testing';
+import { SharedModule } from '../../shared.module';
 
 describe('TruncatePipe', () => {
   const pipe = new TruncatePipe();
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [SharedModule],
+    });
+  });
 
   it('create an instance', () => {
     expect(pipe).toBeTruthy();

@@ -8,6 +8,7 @@ import { HelperComponent } from './helper.component';
 import { HelperService } from '../../../services/helper/helper.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { windowProvider, WindowToken } from '../../../../../window';
+import { SharedModule } from '../../../shared.module';
 
 describe('HelperComponent', () => {
   let component: HelperComponent;
@@ -21,7 +22,7 @@ describe('HelperComponent', () => {
           { provide: HelperService },
           { provide: WindowToken, useFactory: windowProvider },
         ],
-        imports: [BrowserAnimationsModule],
+        imports: [SharedModule, BrowserAnimationsModule],
       }).compileComponents();
     })
   );

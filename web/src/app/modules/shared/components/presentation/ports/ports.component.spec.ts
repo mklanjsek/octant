@@ -6,6 +6,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { PortsComponent } from './ports.component';
 import { ButtonGroupComponent } from '../button-group/button-group.component';
+import { SharedModule } from '../../../shared.module';
 
 describe('PortsComponent', () => {
   let component: PortsComponent;
@@ -14,6 +15,7 @@ describe('PortsComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
+        imports: [SharedModule],
         declarations: [PortsComponent, ButtonGroupComponent],
       }).compileComponents();
     })

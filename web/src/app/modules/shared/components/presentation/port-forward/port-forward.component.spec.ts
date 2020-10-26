@@ -5,6 +5,7 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { PortForwardComponent } from './port-forward.component';
+import { SharedModule } from '../../../shared.module';
 
 describe('PortForwardComponent', () => {
   let component: PortForwardComponent;
@@ -13,6 +14,7 @@ describe('PortForwardComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
+        imports: [SharedModule],
         declarations: [PortForwardComponent],
       }).compileComponents();
     })
