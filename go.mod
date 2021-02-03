@@ -5,7 +5,7 @@ go 1.15
 require (
 	contrib.go.opencensus.io/exporter/jaeger v0.2.1
 	github.com/GeertJohan/go.rice v1.0.2
-	github.com/asticode/go-astikit v0.9.1
+	github.com/asticode/go-astikit v0.17.0
 	github.com/asticode/go-astilectron v0.18.0
 	github.com/asticode/go-astilectron-bundler v0.7.2
 	github.com/davecgh/go-spew v1.1.1
@@ -42,7 +42,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/skratchdot/open-golang v0.0.0-20190402232053-79abb63cd66e
 	github.com/soheilhy/cmux v0.1.4
-	github.com/spf13/afero v1.4.1
+	github.com/spf13/afero v1.5.1
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/viper v1.7.1
 	github.com/stoewer/go-strcase v1.2.0
