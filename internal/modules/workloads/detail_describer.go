@@ -118,8 +118,8 @@ _%s_
 	}
 
 	var objects []*unstructured.Unstructured
-	for _, pod := range cur.Pods().Items {
-		objects = append(objects, &pod)
+	for i := 0; i < len(cur.Pods().Items); i++ {
+		objects = append(objects, &cur.Pods().Items[i])
 	}
 
 	rv, err := resourceviewer.Create(ctx, options.Dash, options.Queryer, objects...)
@@ -147,7 +147,7 @@ _%s_
 
 func (d *DetailDescriber) createResponse(components ...component.Component) component.ContentResponse {
 	cr := component.ContentResponse{
-		Title:      component.TitleFromString("Workload X"),
+		Title:      component.TitleFromString(""),
 		Components: components,
 	}
 
